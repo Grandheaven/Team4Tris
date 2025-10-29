@@ -16,4 +16,3 @@ public class Page1 : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 }
- 
