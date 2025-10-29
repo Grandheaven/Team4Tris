@@ -4186,7 +4186,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 862547444}
+<<<<<<< Updated upstream
   - {fileID: 1862064566}
+=======
+  - {fileID: 1422799786}
+>>>>>>> Stashed changes
   - {fileID: 1915144080}
   - {fileID: 1423953874}
   m_Father: {fileID: 0}
@@ -8254,8 +8258,13 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1423039218}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+<<<<<<< Updated upstream
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
+=======
+  m_LocalPosition: {x: -3510.984, y: -7745.5747, z: 8047.396}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+>>>>>>> Stashed changes
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 385237441}
