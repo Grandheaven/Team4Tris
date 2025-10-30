@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TMPro;
 
 namespace UnityEngine.UI.TableUI
@@ -894,6 +895,11 @@ namespace UnityEngine.UI.TableUI
                 _columnsWidth[i] = width;
             }
             Refresh();
+        }
+
+        public void Initialize()
+        {
+            throw new NotImplementedException();
         }
 
         [System.Serializable]
