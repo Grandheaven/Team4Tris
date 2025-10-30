@@ -1707,9 +1707,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
-  targetPopup: {fileID: 0}
-  guideMessage: {fileID: 0}
-  otherButton: {fileID: 0}
 --- !u!1 &127992473
 GameObject:
   m_ObjectHideFlags: 0
@@ -8142,9 +8139,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
-  targetPopup: {fileID: 0}
-  guideMessage: {fileID: 0}
-  otherButton: {fileID: 0}
 --- !u!1 &597485128
 GameObject:
   m_ObjectHideFlags: 0
@@ -17037,9 +17031,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
-  targetPopup: {fileID: 0}
-  guideMessage: {fileID: 0}
-  otherButton: {fileID: 0}
 --- !u!1 &1344500434
 GameObject:
   m_ObjectHideFlags: 0
@@ -24042,9 +24033,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
-  targetPopup: {fileID: 1939629158}
-  guideMessage: {fileID: 1939629158}
-  otherButton: {fileID: 0}
 --- !u!1 &1783176512
 GameObject:
   m_ObjectHideFlags: 0
@@ -26497,9 +26485,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
-  targetPopup: {fileID: 0}
-  guideMessage: {fileID: 0}
-  otherButton: {fileID: 0}
 --- !u!1 &1983749883
 GameObject:
   m_ObjectHideFlags: 0
@@ -27721,9 +27706,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
-  targetPopup: {fileID: 1069645807}
-  guideMessage: {fileID: 54099617}
-  otherButton: {fileID: 0}
 --- !u!1 &2051770114
 GameObject:
   m_ObjectHideFlags: 0

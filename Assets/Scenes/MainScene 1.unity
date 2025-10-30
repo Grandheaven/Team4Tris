@@ -1152,9 +1152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c525fc88942e2948b6004f7d98f2f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPopup: {fileID: 1995657120}
-  guideMessage: {fileID: 1995657120}
-  otherButton: {fileID: 0}
+  targetObject: {fileID: 1995657120}
 --- !u!114 &261028273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3639,9 +3637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c525fc88942e2948b6004f7d98f2f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPopup: {fileID: 1302773019}
-  guideMessage: {fileID: 1302773019}
-  otherButton: {fileID: 0}
+  targetObject: {fileID: 1302773019}
 --- !u!114 &648013943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4110,9 +4106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c525fc88942e2948b6004f7d98f2f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPopup: {fileID: 799774386}
-  guideMessage: {fileID: 799774386}
-  otherButton: {fileID: 0}
+  targetObject: {fileID: 799774386}
 --- !u!114 &716600037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7598,19 +7592,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1417231423}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2120776077}
-        m_TargetAssemblyTypeName: Page1_DB, Assembly-CSharp
-        m_MethodName: DataBaseConnection
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1417231423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7661,9 +7643,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c525fc88942e2948b6004f7d98f2f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetPopup: {fileID: 0}
-  guideMessage: {fileID: 0}
-  otherButton: {fileID: 0}
+  targetObject: {fileID: 0}
 --- !u!1 &1442776177
 GameObject:
   m_ObjectHideFlags: 0
@@ -11245,61 +11225,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2101280679}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &2120776076
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2120776078}
-  - component: {fileID: 2120776077}
-  m_Layer: 0
-  m_Name: DBConnection
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2120776077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2120776076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29bc0d7a737fa2340aa95c319f899e8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  username: {fileID: 1797243429}
-  birth: {fileID: 1850070434}
-  sex: {fileID: 214226187}
-  tel: {fileID: 999193348}
-  email: {fileID: 1314545036}
-  photo: {fileID: 586580871}
-  successUI: {fileID: 1302773019}
-  alertUI: {fileID: 1995657120}
-  alertText: {fileID: 1415483994}
-  failUI: {fileID: 799774386}
-  failText: {fileID: 169937390}
---- !u!4 &2120776078
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2120776076}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 979.052, y: 548.94324, z: -8.394991}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2129252161
 GameObject:
   m_ObjectHideFlags: 0

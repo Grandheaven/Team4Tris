@@ -3,51 +3,30 @@ using UnityEngine.UI;
 
 public class popup : MonoBehaviour
 {
-    [Header("팝업 오브젝트 (각 버튼별로 다른 팝업)")]
-    [SerializeField] private GameObject targetPopup;
-
-    [Header("안내문 오브젝트 (각 버튼별로 다름)")]
-    [SerializeField] private GameObject guideMessage;
-
-    [Header("다른 버튼 오브젝트 (상호 제어용)")]
-    [SerializeField] private GameObject otherButton;
+    [Header("보였다/숨길 대상 오브젝트")]
+    [SerializeField] private GameObject targetObject;
 
     private Button button;
 
     void Awake()
     {
+        // 버튼 컴포넌트 가져오기
         button = GetComponent<Button>();
-        button.onClick.AddListener(OnButtonClicked);
+
+        // 버튼 클릭 이벤트 등록
+        button.onClick.AddListener(ToggleObject);
     }
 
-    private void OnButtonClicked()
+    private void ToggleObject()
     {
-        // 1️⃣ 다른 버튼 숨김
-        if (otherButton != null)
-            otherButton.SetActive(false);
-
-        // 2️⃣ 내 팝업 토글
-        if (targetPopup != null)
+        if (targetObject == null)
         {
-            bool nextState = !targetPopup.activeSelf;
-            targetPopup.SetActive(nextState);
+            Debug.LogWarning("⚠️ targetObject가 연결되지 않았습니다!");
+            return;
         }
 
-        // 3️⃣ 안내문 표시 (팝업이 켜질 때만)
-        if (guideMessage != null)
-            guideMessage.SetActive(targetPopup.activeSelf);
-    }
-
-    // 4️⃣ 팝업 닫을 때 다시 다른 버튼 보이게
-    public void ClosePopup()
-    {
-        if (targetPopup != null)
-            targetPopup.SetActive(false);
-
-        if (guideMessage != null)
-            guideMessage.SetActive(false);
-
-        if (otherButton != null)
-            otherButton.SetActive(true);
+        // 활성화 상태를 반전시킴
+        bool nextState = !targetObject.activeSelf;
+        targetObject.SetActive(nextState);
     }
 }
