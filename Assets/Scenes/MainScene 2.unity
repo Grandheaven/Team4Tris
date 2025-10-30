@@ -123,6 +123,86 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &5429679
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5429681}
+  - component: {fileID: 5429680}
+  - component: {fileID: 5429682}
+  m_Layer: 0
+  m_Name: DBConnection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &5429680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5429679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d0a048bb8f4acb4eaa3709c3c6d75a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  table: {fileID: 2060142585}
+  betaInputField: {fileID: 680248356}
+  conditionDropdown: {fileID: 1258089885}
+  modifyButton: {fileID: 1219432815}
+  deleteButton: {fileID: 591886542}
+  popup1_Details: {fileID: 456193594}
+  popup2_Modify: {fileID: 54099617}
+  popup3_DeleteConfirm: {fileID: 86934511}
+  selectedRowColor: {r: 0.5, g: 0.8, b: 1, a: 1}
+--- !u!4 &5429681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5429679}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 949.4332, y: 546.916, z: 9.455221}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5429682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5429679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce6ee709a9cf3f94a92b73b2f8898691, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  memberinfo: {fileID: 456193594}
+  username: {fileID: 2032854471}
+  birth: {fileID: 1369256777}
+  sex: {fileID: 1599011048}
+  tel: {fileID: 1536231600}
+  email: {fileID: 376983970}
+  photo: {fileID: 1227113281}
+  memberinfo2: {fileID: 54099617}
+  username2: {fileID: 345669305}
+  birth2: {fileID: 1206944574}
+  sex2: {fileID: 1434945204}
+  tel2: {fileID: 536106497}
+  email2: {fileID: 513470600}
+  photo2: {fileID: 243396687}
 --- !u!1 &8365265
 GameObject:
   m_ObjectHideFlags: 0
@@ -5028,7 +5108,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &456193595
 Transform:
   m_ObjectHideFlags: 0
@@ -22393,7 +22473,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC774\uBBF8\uC9C0\n"
+  m_Text: 
 --- !u!222 &1844663373
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -23657,7 +23737,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 987707444}
+      - m_Target: {fileID: 456193594}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -23667,7 +23747,7 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1944208494
 MonoBehaviour:
