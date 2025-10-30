@@ -3260,8 +3260,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -184, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -192, y: 0}
+  m_SizeDelta: {x: 16, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &748362229
 MonoBehaviour:
@@ -3296,7 +3296,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC81C\uBAA9"
+  m_Text: "* \uC81C\uBAA9"
 --- !u!222 &748362230
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5019,7 +5019,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &939961176
 Transform:
   m_ObjectHideFlags: 0
@@ -6059,8 +6059,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -184.00003, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -192.00002, y: 0}
+  m_SizeDelta: {x: 15.9999695, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1151541321
 MonoBehaviour:
@@ -6095,7 +6095,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC800\uC790"
+  m_Text: "* \uC800\uC790"
 --- !u!222 &1151541322
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7496,8 +7496,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -171, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -178, y: 0}
+  m_SizeDelta: {x: 14, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1363627186
 MonoBehaviour:
@@ -7532,7 +7532,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uCD9C\uD310\uC0AC"
+  m_Text: "* \uCD9C\uD310\uC0AC"
 --- !u!222 &1363627187
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7754,7 +7754,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC81C\uBAA9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694"
+  m_text: "\uC81C\uBAA9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694 (\uD544\uC218\uC0AC\uD56D)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
   m_sharedMaterial: {fileID: -3363149638184688338, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
@@ -9081,7 +9081,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAD00\uB828\uB9C1\uD06C\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694"
+  m_text: "\uAD00\uB828\uB9C1\uD06C\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694 (\uD55C\uAE00
+    \uBD88\uAC00\uB2A5)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
   m_sharedMaterial: {fileID: -3363149638184688338, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
@@ -10567,7 +10568,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC800\uC790\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694"
+  m_text: "\uC800\uC790\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694 (\uD544\uC218\uC0AC\uD56D)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
   m_sharedMaterial: {fileID: -3363149638184688338, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
@@ -10723,7 +10724,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uCD9C\uD310\uC0AC\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694"
+  m_text: "\uCD9C\uD310\uC0AC\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694 (\uD544\uC218\uC0AC\uD56D)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
   m_sharedMaterial: {fileID: -3363149638184688338, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
@@ -11476,7 +11477,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "ISBN\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694"
+  m_text: "ISBN\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694 (\uC22B\uC790\uB9CC \uAC00\uB2A5)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
   m_sharedMaterial: {fileID: -3363149638184688338, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
@@ -11569,7 +11570,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1915144080
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12060,8 +12061,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -166, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -172, y: 0}
+  m_SizeDelta: {x: 12, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2078691418
 MonoBehaviour:
@@ -12096,7 +12097,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: ISBN
+  m_Text: '* ISBN'
 --- !u!222 &2078691419
 CanvasRenderer:
   m_ObjectHideFlags: 0

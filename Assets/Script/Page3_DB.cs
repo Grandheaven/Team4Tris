@@ -61,37 +61,31 @@ public class Page3_DB : MonoBehaviour
                 command.Parameters.Add("B_TITLE", OracleDbType.NVarchar2).Value = title.text;
                 command.Parameters.Add("B_AUTHOR", OracleDbType.NVarchar2).Value = author.text;
                 command.Parameters.Add("B_PUBLISHER", OracleDbType.NVarchar2).Value = publisher.text;
-                command.Parameters.Add("B_PRICE", OracleDbType.Decimal).Value = price.text;
-                command.Parameters.Add("B_URL", OracleDbType.Varchar2).Value = url.text;
+                command.Parameters.Add("B_PRICE", OracleDbType.Decimal).Value = (string.IsNullOrEmpty(price.text)) ? DBNull.Value : price.text;
+                command.Parameters.Add("B_URL", OracleDbType.Varchar2).Value = (string.IsNullOrEmpty(url.text)) ? DBNull.Value : url.text;
                 command.Parameters.Add("B_BOOKPHOTO", OracleDbType.Blob).Value = (book_photo == null) ? DBNull.Value : book_photo;
                 command.Parameters.Add("B_ISBN", OracleDbType.Decimal).Value = isbn.text;
                 command.Parameters.Add("B_ISBNPHOTO", OracleDbType.Blob).Value = (isbn_photo == null) ? DBNull.Value : isbn_photo;
-                command.Parameters.Add("B_DESCRIPTION", OracleDbType.NVarchar2).Value = description.text;
+                command.Parameters.Add("B_DESCRIPTION", OracleDbType.NVarchar2).Value = (string.IsNullOrEmpty(description.text)) ? DBNull.Value : description.text;
 
                 command.ExecuteNonQuery();
 
                 successUI.SetActive(true);
             }
-            catch (Exception ex) // 데이터 삽입 실패 시 예외 처리
+            catch (Exception ex)
             {
-                failText.text = ex.Message;
+                failText.text = "필수 입력사항이 누락되거나 \n중복된 도서 정보가 있습니다.";
                 failUI.SetActive(true);
             }
         }
-        catch (Exception ex) // DB 연결 실패 시 예외 처리
+        catch (Exception ex)
         {
-            Debug.LogError("Database connection failed: " + ex.Message);
+            failText.text = "DB 연결에 실패했습니다.";
+            failUI.SetActive(true);
         }
         finally
         {
             connection.Close();
-            Debug.Log("Database connection closed.");
         }
-    }
-
-    public void ClosePopUp()
-    {
-        successUI.SetActive(false);
-        failUI.SetActive(false);
     }
 }
