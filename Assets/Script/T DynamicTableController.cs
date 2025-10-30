@@ -29,7 +29,7 @@ public class DynamicTableController : MonoBehaviour
     public Button modifyButton; // '수정' 버튼
     public Button deleteButton; // '삭제' 버튼
 
-    // (신규) 팝업 UI 오브젝트
+    // 팝업 UI 오브젝트
     [Header("Pop-Up UI")]
     public GameObject popup1_Details; // 행 재클릭 시
     public GameObject popup2_Modify; // 수정 버튼 클릭 시
@@ -50,8 +50,8 @@ public class DynamicTableController : MonoBehaviour
         public int mno { get; set; }
         public string name { get; set; }
         public string birth { get; set; }
-        public string sex { get; set; }
-        public string tel { get; set; }
+        public string sex { get; set; } // "남성" 또는 "여성"이 저장됨
+        public string tel { get; set; } // "010-1234-5678"이 저장됨
     }
 
     void Start()
@@ -84,10 +84,9 @@ public class DynamicTableController : MonoBehaviour
         PopulateTable(allDataRows);
     }
 
-    // (유지) DB에서 데이터를 비동기로 가져오는 메소드
+    // (수정) DB에서 데이터를 비동기로 가져오면서 포맷팅
     private IEnumerator FetchDataFromOracleDB()
     {
-        // ... (내용 동일) ...
         Debug.Log("Oracle DB에서 'MEMBER' 테이블 정보 로드 중...");
         List<DataRow> loadedData = null;
         bool isError = false;
@@ -115,8 +114,10 @@ public class DynamicTableController : MonoBehaviour
                                     mno = reader.GetInt32(reader.GetOrdinal("MNO")),
                                     name = ReadString(reader["NAME"]),
                                     birth = reader.GetDateTime(reader.GetOrdinal("BIRTH")).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                                    sex = ReadString(reader["SEX"]),
-                                    tel = ReadString(reader["TEL"])
+
+                                    // [!!!] (핵심 수정) 포맷팅 함수를 여기서 적용
+                                    sex = FormatSex(ReadString(reader["SEX"])),
+                                    tel = FormatTel(ReadString(reader["TEL"]))
                                 };
                                 tempData.Add(row);
                             }
@@ -149,7 +150,7 @@ public class DynamicTableController : MonoBehaviour
         }
     }
 
-    // --- (유지) TableUI 에셋에 데이터를 채워넣는 메소드 ---
+    // (유지) TableUI 에셋에 데이터를 채워넣는 메소드
     private void PopulateTable(List<DataRow> dataToDisplay)
     {
         ClearSelection();
@@ -169,35 +170,55 @@ public class DynamicTableController : MonoBehaviour
         for (int i = 0; i < dataToDisplay.Count; i++)
         {
             DataRow rowData = dataToDisplay[i];
-            int tableRowIndex = i + 1; // 0번은 헤더이므로 데이터는 1번부터 시작
+            int tableRowIndex = i + 1;
 
             // 3-1. 셀에 데이터 할당
-            table.GetCell(tableRowIndex, 0).text = rowData.mno.ToString();
-            table.GetCell(tableRowIndex, 1).text = rowData.name;
-            table.GetCell(tableRowIndex, 2).text = rowData.birth;
-            table.GetCell(tableRowIndex, 3).text = rowData.sex;
-            table.GetCell(tableRowIndex, 4).text = rowData.tel;
+            TMP_Text mnoText = table.GetCell(tableRowIndex, 0);
+            mnoText.text = rowData.mno.ToString();
+            mnoText.raycastTarget = false;
+
+            TMP_Text nameText = table.GetCell(tableRowIndex, 1);
+            nameText.text = rowData.name;
+            nameText.raycastTarget = false;
+
+            TMP_Text birthText = table.GetCell(tableRowIndex, 2);
+            birthText.text = rowData.birth;
+            birthText.raycastTarget = false;
+
+            TMP_Text sexText = table.GetCell(tableRowIndex, 3);
+            sexText.text = rowData.sex; // "남성" 또는 "여성"
+            sexText.raycastTarget = false;
+
+            TMP_Text telText = table.GetCell(tableRowIndex, 4);
+            telText.text = rowData.tel; // "010-1234-5678"
+            telText.raycastTarget = false;
 
             // 3-2. 행(Row) GameObject에 클릭 이벤트(Button) 추가
             GameObject rowObject = table.GetCell(tableRowIndex, 0).transform.parent.parent.gameObject;
+            rowObject.transform.localScale = Vector3.one;
+            rowObject.transform.localPosition = new Vector3(
+                rowObject.transform.localPosition.x,
+                rowObject.transform.localPosition.y,
+                0f
+            );
+
             Button rowButton = rowObject.GetComponent<Button>();
             if (rowButton == null)
                 rowButton = rowObject.AddComponent<Button>();
 
-            Image rowImage = rowObject.transform.Find("Borders").GetComponent<Image>();
+            Image rowImage = rowObject.transform.Find("panel").GetComponent<Image>();
             if (rowImage != null)
             {
                 rowButton.targetGraphic = rowImage;
             }
 
-            // (수정) 클릭 시 OnRowClicked 함수 호출 (기능 변경됨)
             rowButton.onClick.RemoveAllListeners();
             rowButton.onClick.AddListener(() => OnRowClicked(rowData, rowObject));
         }
     }
 
 
-    // --- (유지) 검색 처리 ---
+    // (유지) 검색 처리
     private void OnSearchEndEdit(string searchText)
     {
         if (!Input.GetKeyDown(KeyCode.Return) && !Input.GetKeyDown(KeyCode.KeypadEnter) && betaInputField.isFocused)
@@ -220,71 +241,52 @@ public class DynamicTableController : MonoBehaviour
         );
     }
 
-    //
-    // --- (핵심 수정) 행 클릭 이벤트 (선택 / 팝업1) ---
-    //
+    // (유지) 행 클릭 이벤트 (선택 / 팝업1)
     private void OnRowClicked(DataRow clickedData, GameObject rowObject)
     {
-        Image panelImage = rowObject.transform.Find("Borders").GetComponent<Image>();
-        if (panelImage == null) return; // 'panel'을 찾지 못하면 중단
+        Image panelImage = rowObject.transform.Find("panel").GetComponent<Image>();
+        if (panelImage == null) return;
 
-        // (신규) 1. 클릭한 행이 이미 선택된 행인지 확인
         if (selectedRowObject == rowObject)
         {
-            // 이미 선택된 행을 다시 클릭함 -> Popup 1 열기
+            // Popup 1 열기
             Debug.Log($"선택된 행({selectedRow.name})을 다시 클릭했습니다. Popup 1을 엽니다.");
-
-            // [!!!] 여기에 Popup 1에 'clickedData'의 상세 정보를 채워넣는 로직을 구현하세요.
-            // 예: popup1_Details.GetComponent<Popup1Script>().ShowDetails(clickedData);
-
+            // [!!!] Popup 1에 'clickedData'의 상세 정보를 채워넣는 로직 구현
             popup1_Details.SetActive(true);
         }
         else
         {
-            // (기존) 2. 다른 행을 클릭함 -> 선택 상태 변경
-
-            // 2-1. 이전에 선택된 행이 있다면, 원래 색상으로 복원
+            // 다른 행 클릭 (선택 상태 변경)
             if (selectedRowObject != null)
             {
-                Image prevImage = selectedRowObject.transform.Find("Borders").GetComponent<Image>();
+                Image prevImage = selectedRowObject.transform.Find("panel").GetComponent<Image>();
                 if (prevImage != null)
                 {
-                    prevImage.color = originalSelectedRowColor; // 저장해둔 원래 색상으로 복원
+                    prevImage.color = originalSelectedRowColor;
                 }
             }
 
-            // 2-2. 새로 선택된 행을 강조하고 데이터 저장
             selectedRow = clickedData;
             selectedRowObject = rowObject;
-            originalSelectedRowColor = panelImage.color; // TableUI가 적용한 줄무늬 색상을 저장
-            panelImage.color = selectedRowColor; // 강조 색상 적용
+            originalSelectedRowColor = panelImage.color;
+            panelImage.color = selectedRowColor;
 
-            // 2-3. 수정/삭제 버튼 활성화
             SetButtonsInteractable(true);
-
             Debug.Log($"행 선택! MNO: {selectedRow.mno}, NAME: {selectedRow.name}");
         }
     }
 
-    // --- (수정) 하단 버튼 이벤트 (팝업2, 팝업3) ---
-
+    // (유지) 하단 버튼 이벤트 (팝업2, 팝업3)
     private void OnModifyButtonClicked()
     {
         if (selectedRow == null)
         {
             Debug.LogWarning("수정할 행을 먼저 선택하세요.");
-            // [!!!] (선택사항) "행을 선택하세요" 알림 팝업을 띄울 수 있습니다.
             return;
         }
-
         Debug.Log($"[수정] 버튼 클릭: {selectedRow.name} (MNO: {selectedRow.mno}) -> Popup 2를 엽니다.");
-
-        // [!!!] 여기에 '수정' 팝업(popup2_Modify)을 띄우기 전,
-        // 'selectedRow'의 데이터(mno, name 등)를 팝업창의 InputField에 채워 넣는
-        // 로직을 구현해야 합니다.
-        // 예: popup2_Modify.GetComponent<ModifyPopupScript>().Initialize(selectedRow);
-
-        popup2_Modify.SetActive(true); // (수정) 팝업2 열기
+        // [!!!] Popup 2의 InputField에 'selectedRow' 데이터 채워넣기
+        popup2_Modify.SetActive(true);
     }
 
     private void OnDeleteButtonClicked()
@@ -292,22 +294,14 @@ public class DynamicTableController : MonoBehaviour
         if (selectedRow == null)
         {
             Debug.LogWarning("삭제할 행을 먼저 선택하세요.");
-            // [!!!] (선택사항) "행을 선택하세요" 알림 팝업을 띄울 수 있습니다.
             return;
         }
-
         Debug.Log($"[삭제] 버튼 클릭: {selectedRow.name} (MNO: {selectedRow.mno}) -> Popup 3를 엽니다.");
-
-        // [!!!] 여기에 '삭제 확인' 팝업(popup3_DeleteConfirm)의 텍스트를
-        // "정말로 '홍길동' 님을 삭제하시겠습니까?" 등으로 설정할 수 있습니다.
-        // 예: popup3_DeleteConfirm.GetComponentInChildren<TMP_Text>().text = $"{selectedRow.name}님을 삭제하시겠습니까?";
-
-        popup3_DeleteConfirm.SetActive(true); // (수정) 팝업3 열기
-
-        // StartCoroutine(DeleteMemberFromDB(selectedRow)); // (이동) 이 코드는 ConfirmDelete()로 이동
+        // [!!!] Popup 3의 텍스트 설정
+        popup3_DeleteConfirm.SetActive(true);
     }
 
-    // --- (유지) DB 삭제 로직 ---
+    // (유지) DB 삭제 로직
     private IEnumerator DeleteMemberFromDB(DataRow rowToDelete)
     {
         // ... (내용 동일) ...
@@ -346,41 +340,25 @@ public class DynamicTableController : MonoBehaviour
         else
         {
             Debug.Log($"MNO: {rowToDelete.mno} 삭제 완료.");
-            // 1. 로컬 마스터 데이터 리스트에서도 삭제
             allDataRows.Remove(rowToDelete);
-            // 2. 테이블 전체를 다시 그림
             PopulateTable(allDataRows);
-            // (ClearSelection은 PopulateTable 내부에서 호출됨)
         }
     }
 
-    // --- (신규) 9. 팝업 버튼 이벤트 처리 ---
-
-    /// <summary>
-    /// 삭제 확인 팝업(Popup 3)에서 '예' 버튼을 눌렀을 때 호출됩니다.
-    /// (Inspector의 OnClick() 이벤트에 연결)
-    /// </summary>
+    // (유지) 팝업 버튼 이벤트 처리
     public void ConfirmDelete()
     {
         if (selectedRow != null)
         {
-            // DB 삭제 코루틴 실행
             StartCoroutine(DeleteMemberFromDB(selectedRow));
         }
         else
         {
             Debug.LogError("삭제할 행이 선택되지 않았는데 ConfirmDelete가 호출되었습니다.");
         }
-
-        // 팝업 닫기
         popup3_DeleteConfirm.SetActive(false);
     }
 
-    /// <summary>
-    /// 팝업의 '닫기' 또는 '취소' 버튼에서 호출할 수 있는 범용 닫기 함수입니다.
-    /// (Inspector의 OnClick() 이벤트에 연결)
-    /// </summary>
-    /// <param name="popupToClose">닫을 팝업 GameObject</param>
     public void ClosePopUp(GameObject popupToClose)
     {
         if (popupToClose != null)
@@ -395,6 +373,52 @@ public class DynamicTableController : MonoBehaviour
         return (dbValue == DBNull.Value || dbValue == null) ? string.Empty : dbValue.ToString();
     }
 
+    //
+    // --- (신규) 포맷팅 헬퍼 함수 ---
+    //
+
+    /// <summary>
+    /// 성별 코드('M', 'F')를 '남성', '여성'으로 변환합니다.
+    /// </summary>
+    private string FormatSex(string rawSex)
+    {
+        if (rawSex == "M") return "남성";
+        if (rawSex == "F") return "여성";
+        return rawSex; // 그 외의 경우 원본 반환
+    }
+
+    /// <summary>
+    /// 10자리 숫자 연락처(예: 1012345678)를 "010-1234-5678" 형식으로 변환합니다.
+    /// </summary>
+    private string FormatTel(string rawTel)
+    {
+        if (string.IsNullOrEmpty(rawTel))
+        {
+            return string.Empty;
+        }
+
+        // 1. "0" 덧붙이기
+        string telWithZero = "0" + rawTel; // 예: "01012345678"
+
+        // 2. 11자리인 경우 (010-1234-5678), 3-4-4 포맷 적용
+        if (telWithZero.Length == 11)
+        {
+            try
+            {
+                // Substring(startIndex, length)
+                return $"{telWithZero.Substring(0, 3)}-{telWithZero.Substring(3, 4)}-{telWithZero.Substring(7, 4)}";
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"전화번호 포맷팅 실패 (입력: {rawTel}): {ex.Message}");
+                return telWithZero; // 포맷 실패 시 '0'만 붙인 원본 반환
+            }
+        }
+
+        // 11자리가 아닐 경우 (데이터가 10자리가 아닌 경우)
+        return telWithZero;
+    }
+
     private void SetButtonsInteractable(bool interactable)
     {
         modifyButton.interactable = interactable;
@@ -403,16 +427,14 @@ public class DynamicTableController : MonoBehaviour
 
     private void ClearSelection()
     {
-        // 선택된 것이 있었다면 색상 복원
         if (selectedRowObject != null)
         {
-            Image prevImage = selectedRowObject.transform.Find("Borders").GetComponent<Image>();
+            Image prevImage = selectedRowObject.transform.Find("panel").GetComponent<Image>();
             if (prevImage != null)
             {
                 prevImage.color = originalSelectedRowColor;
             }
         }
-
         selectedRow = null;
         selectedRowObject = null;
         SetButtonsInteractable(false);
