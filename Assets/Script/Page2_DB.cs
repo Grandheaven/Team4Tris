@@ -35,6 +35,9 @@ public class Page2_DB : MonoBehaviour
     public TMP_InputField tel2;
     public TMP_InputField email2;
     public RawImage photo2;
+    public GameObject background1;
+    public GameObject background2;
+    public GameObject background3;
 
     [Header("Pop-Up Object")]
     public GameObject successUI;
@@ -120,6 +123,10 @@ public class Page2_DB : MonoBehaviour
 
     public void MemberModify()
     {
+        background1.SetActive(false);
+        background2.SetActive(false);
+        background3.SetActive(false);
+
         string tel = datatel.Replace("-", "").Replace(" ", "");
         tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
 

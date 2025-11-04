@@ -203,6 +203,9 @@ MonoBehaviour:
   tel2: {fileID: 536106497}
   email2: {fileID: 513470600}
   photo2: {fileID: 243396687}
+  background1: {fileID: 34502550}
+  background2: {fileID: 127992473}
+  background3: {fileID: 987707444}
   successUI: {fileID: 0}
   alertUI: {fileID: 0}
   alertText: {fileID: 0}
@@ -25762,7 +25765,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0000034571, y: 99.1}
+  m_AnchoredPosition: {x: -0.0000034571, y: 125}
   m_SizeDelta: {x: 968.47, y: 183.19}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2060142583
@@ -25910,7 +25913,7 @@ MonoBehaviour:
   - {fileID: 406107067}
   - {fileID: 88853236}
   - {fileID: 2085379563}
-  undoRedoEvent: Select Table (GameObject)
+  undoRedoEvent: Modified RectTransform Values
 --- !u!1 &2061029234
 GameObject:
   m_ObjectHideFlags: 0

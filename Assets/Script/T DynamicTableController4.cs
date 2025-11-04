@@ -33,7 +33,7 @@ public class DynamicTableController4 : MonoBehaviour
     public GameObject popup3_DeleteConfirm;
 
     [Header("테이블 스타일")]
-    public Color selectedRowColor = new Color(0.5f, 0.8f, 1f);
+    public Color selectedRowColor = new Color(0.5f, 0.8f, 1f); // 파란색 강조 색상
 
     private List<DataRow> allDataRows = new List<DataRow>();
     private DataRow selectedRow = null;
@@ -212,31 +212,46 @@ public class DynamicTableController4 : MonoBehaviour
         );
     }
 
-    // --- 행 클릭 ---
+    // --- ✅ 행 클릭 시 행 전체 색상 변경 기능 포함 ---
     private void OnRowClicked(DataRow clickedData, GameObject rowObject)
     {
+        // 같은 행을 다시 클릭하면 상세 팝업 열기
         if (selectedRowObject == rowObject)
         {
             popup1_Details.SetActive(true);
             return;
         }
 
+        // 이전 행 색상 복원
         if (selectedRowObject != null)
         {
-            Image prev = selectedRowObject.GetComponent<Image>();
-            if (prev != null) prev.color = originalSelectedRowColor;
+            foreach (Transform cell in selectedRowObject.transform)
+            {
+                Image cellImage = cell.GetComponent<Image>();
+                if (cellImage != null)
+                    cellImage.color = originalSelectedRowColor;
+            }
         }
 
+        // 현재 선택 행 저장
         selectedRow = clickedData;
         selectedRowObject = rowObject;
 
-        Image image = rowObject.GetComponent<Image>();
-        if (image != null)
+        // 첫 번째 셀 색상을 기준으로 원래 색상 저장
+        Transform firstCell = rowObject.transform.GetChild(0);
+        Image firstCellImage = firstCell.GetComponent<Image>();
+        if (firstCellImage != null)
+            originalSelectedRowColor = firstCellImage.color;
+
+        // 행 전체 색상 변경
+        foreach (Transform cell in rowObject.transform)
         {
-            originalSelectedRowColor = image.color;
-            image.color = selectedRowColor;
+            Image cellImage = cell.GetComponent<Image>();
+            if (cellImage != null)
+                cellImage.color = selectedRowColor;
         }
 
+        // 버튼 활성화
         SetButtonsInteractable(true);
         Debug.Log($"선택된 도서: {selectedRow.title} / {selectedRow.rent_status}");
     }
@@ -333,9 +348,12 @@ public class DynamicTableController4 : MonoBehaviour
     {
         if (selectedRowObject != null)
         {
-            Image prev = selectedRowObject.GetComponent<Image>();
-            if (prev != null)
-                prev.color = originalSelectedRowColor;
+            foreach (Transform cell in selectedRowObject.transform)
+            {
+                Image cellImage = cell.GetComponent<Image>();
+                if (cellImage != null)
+                    cellImage.color = originalSelectedRowColor;
+            }
         }
 
         selectedRow = null;
