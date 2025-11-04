@@ -44,6 +44,8 @@ public class Page3_DB : MonoBehaviour
 
             try
             {
+                string price = this.price.text.Replace(",", "").Replace("¿ø", "");
+
                 byte[] book_photo = null;
                 if (this.bookPhoto.texture != null)
                 {
@@ -61,7 +63,7 @@ public class Page3_DB : MonoBehaviour
                 command.Parameters.Add("B_TITLE", OracleDbType.NVarchar2).Value = title.text;
                 command.Parameters.Add("B_AUTHOR", OracleDbType.NVarchar2).Value = author.text;
                 command.Parameters.Add("B_PUBLISHER", OracleDbType.NVarchar2).Value = publisher.text;
-                command.Parameters.Add("B_PRICE", OracleDbType.Decimal).Value = (string.IsNullOrEmpty(price.text)) ? DBNull.Value : price.text;
+                command.Parameters.Add("B_PRICE", OracleDbType.Decimal).Value = (string.IsNullOrEmpty(price)) ? DBNull.Value : price;
                 command.Parameters.Add("B_URL", OracleDbType.Varchar2).Value = (string.IsNullOrEmpty(url.text)) ? DBNull.Value : url.text;
                 command.Parameters.Add("B_BOOKPHOTO", OracleDbType.Blob).Value = (book_photo == null) ? DBNull.Value : book_photo;
                 command.Parameters.Add("B_ISBN", OracleDbType.Decimal).Value = isbn.text;

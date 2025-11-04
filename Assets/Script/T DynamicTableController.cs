@@ -84,7 +84,7 @@ public class DynamicTableController : MonoBehaviour
         PopulateTable(allDataRows);
     }
 
-    // (수정) DB에서 데이터를 비동기로 가져오면서 포맷팅
+    // (유지) DB에서 데이터를 비동기로 가져오는 메소드
     private IEnumerator FetchDataFromOracleDB()
     {
         Debug.Log("Oracle DB에서 'MEMBER' 테이블 정보 로드 중...");
@@ -114,8 +114,6 @@ public class DynamicTableController : MonoBehaviour
                                     mno = reader.GetInt32(reader.GetOrdinal("MNO")),
                                     name = ReadString(reader["NAME"]),
                                     birth = reader.GetDateTime(reader.GetOrdinal("BIRTH")).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-
-                                    // [!!!] (핵심 수정) 포맷팅 함수를 여기서 적용
                                     sex = FormatSex(ReadString(reader["SEX"])),
                                     tel = FormatTel(ReadString(reader["TEL"]))
                                 };
@@ -186,11 +184,11 @@ public class DynamicTableController : MonoBehaviour
             birthText.raycastTarget = false;
 
             TMP_Text sexText = table.GetCell(tableRowIndex, 3);
-            sexText.text = rowData.sex; // "남성" 또는 "여성"
+            sexText.text = rowData.sex;
             sexText.raycastTarget = false;
 
             TMP_Text telText = table.GetCell(tableRowIndex, 4);
-            telText.text = rowData.tel; // "010-1234-5678"
+            telText.text = rowData.tel;
             telText.raycastTarget = false;
 
             // 3-2. 행(Row) GameObject에 클릭 이벤트(Button) 추가
@@ -230,15 +228,37 @@ public class DynamicTableController : MonoBehaviour
         PopulateTable(filteredList);
     }
 
+    //
+    // --- [!!!] (핵심 수정) 검색 조건에 따라 필터링하는 메소드 ---
+    //
     private List<DataRow> FilterData(List<DataRow> data, string condition, string searchText)
     {
         if (string.IsNullOrEmpty(searchText))
-            return data;
+            return data; // 검색어가 없으면 전체 리스트 반환
 
-        // [!!!] 검색 조건(condition)에 따라 검색 컬럼 바꾸는 로직 추가 필요
+        // 검색 시 대소문자를 무시하기 위한 설정
+        var comparison = System.StringComparison.OrdinalIgnoreCase;
+
         return data.FindAll(row =>
-            row.name.IndexOf(searchText, System.StringComparison.OrdinalIgnoreCase) >= 0
-        );
+        {
+            switch (condition)
+            {
+                case "이름":
+                    // '이름' 필드에서 검색어가 포함되어 있는지 확인
+                    return row.name.IndexOf(searchText, comparison) >= 0;
+
+                case "전화번호":
+                    // '연락처' 필드에서 검색어가 포함되어 있는지 확인
+                    // (예: "1234"로 "010-1234-5678" 검색 가능)
+                    return row.tel.IndexOf(searchText, comparison) >= 0;
+
+                case "선택":
+                default:
+                    // '선택'이거나 예상치 못한 값일 경우, 모든 필드에서 검색
+                    return row.name.IndexOf(searchText, comparison) >= 0 ||
+                           row.tel.IndexOf(searchText, comparison) >= 0;
+            }
+        });
     }
 
     // (유지) 행 클릭 이벤트 (선택 / 팝업1)
@@ -251,8 +271,9 @@ public class DynamicTableController : MonoBehaviour
         {
             // Popup 1 열기
             Debug.Log($"선택된 행({selectedRow.name})을 다시 클릭했습니다. Popup 1을 엽니다.");
-            // [!!!] Popup 1에 'clickedData'의 상세 정보를 채워넣는 로직 구현
             popup1_Details.SetActive(true);
+            Page2_DB.run = true; // Page2_DB 스크립트의 run 플래그 설정
+            Page2_DB.datatel = selectedRow.tel; // Page2_DB 스크립트의 datatel 설정
         }
         else
         {
@@ -285,8 +306,9 @@ public class DynamicTableController : MonoBehaviour
             return;
         }
         Debug.Log($"[수정] 버튼 클릭: {selectedRow.name} (MNO: {selectedRow.mno}) -> Popup 2를 엽니다.");
-        // [!!!] Popup 2의 InputField에 'selectedRow' 데이터 채워넣기
         popup2_Modify.SetActive(true);
+        Page2_DB.run = true; // Page2_DB 스크립트의 run 플래그 설정
+        Page2_DB.datatel = selectedRow.tel; // Page2_DB 스크립트의 datatel 설정
     }
 
     private void OnDeleteButtonClicked()
@@ -297,14 +319,12 @@ public class DynamicTableController : MonoBehaviour
             return;
         }
         Debug.Log($"[삭제] 버튼 클릭: {selectedRow.name} (MNO: {selectedRow.mno}) -> Popup 3를 엽니다.");
-        // [!!!] Popup 3의 텍스트 설정
         popup3_DeleteConfirm.SetActive(true);
     }
 
     // (유지) DB 삭제 로직
     private IEnumerator DeleteMemberFromDB(DataRow rowToDelete)
     {
-        // ... (내용 동일) ...
         bool isError = false;
         string errorMessage = "";
 
@@ -373,13 +393,7 @@ public class DynamicTableController : MonoBehaviour
         return (dbValue == DBNull.Value || dbValue == null) ? string.Empty : dbValue.ToString();
     }
 
-    //
-    // --- (신규) 포맷팅 헬퍼 함수 ---
-    //
-
-    /// <summary>
-    /// 성별 코드('M', 'F')를 '남성', '여성'으로 변환합니다.
-    /// </summary>
+    // (유지) 포맷팅 헬퍼 함수
     private string FormatSex(string rawSex)
     {
         if (rawSex == "M") return "남성";
@@ -387,9 +401,6 @@ public class DynamicTableController : MonoBehaviour
         return rawSex; // 그 외의 경우 원본 반환
     }
 
-    /// <summary>
-    /// 10자리 숫자 연락처(예: 1012345678)를 "010-1234-5678" 형식으로 변환합니다.
-    /// </summary>
     private string FormatTel(string rawTel)
     {
         if (string.IsNullOrEmpty(rawTel))
@@ -397,25 +408,21 @@ public class DynamicTableController : MonoBehaviour
             return string.Empty;
         }
 
-        // 1. "0" 덧붙이기
-        string telWithZero = "0" + rawTel; // 예: "01012345678"
+        string telWithZero = "0" + rawTel;
 
-        // 2. 11자리인 경우 (010-1234-5678), 3-4-4 포맷 적용
         if (telWithZero.Length == 11)
         {
             try
             {
-                // Substring(startIndex, length)
                 return $"{telWithZero.Substring(0, 3)}-{telWithZero.Substring(3, 4)}-{telWithZero.Substring(7, 4)}";
             }
             catch (Exception ex)
             {
                 Debug.LogWarning($"전화번호 포맷팅 실패 (입력: {rawTel}): {ex.Message}");
-                return telWithZero; // 포맷 실패 시 '0'만 붙인 원본 반환
+                return telWithZero;
             }
         }
 
-        // 11자리가 아닐 경우 (데이터가 10자리가 아닌 경우)
         return telWithZero;
     }
 
