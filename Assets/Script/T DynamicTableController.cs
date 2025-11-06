@@ -320,6 +320,18 @@ public class DynamicTableController : MonoBehaviour
         }
         Debug.Log($"[삭제] 버튼 클릭: {selectedRow.name} (MNO: {selectedRow.mno}) -> Popup 3를 엽니다.");
         popup3_DeleteConfirm.SetActive(true);
+
+        Debug.Log(selectedRow.name + "??");
+        Debug.Log(selectedRow.birth + "??");
+        Debug.Log(selectedRow.sex + "??");
+        Debug.Log(selectedRow.tel + "??");
+
+        Page2_DB.run = true;
+        Page2_DB.delete = true;
+        Page2_DB.dataname = selectedRow.name;
+        Page2_DB.databirth = selectedRow.birth;
+        Page2_DB.datasex = selectedRow.sex;
+        Page2_DB.datatel = selectedRow.tel;
     }
 
     // (유지) DB 삭제 로직
