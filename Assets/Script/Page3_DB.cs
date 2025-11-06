@@ -24,7 +24,6 @@ public class Page3_DB : MonoBehaviour
     public TMP_InputField url;
     public RawImage bookPhoto;
     public TMP_InputField isbn;
-    public RawImage isbnPhoto;
     public TMP_InputField description;
 
     [Header("Pop-Up Object")]
@@ -53,22 +52,14 @@ public class Page3_DB : MonoBehaviour
                     book_photo = texture.EncodeToPNG();
                 }
 
-                byte[] isbn_photo = null;
-                if (this.isbnPhoto.texture != null)
-                {
-                    Texture2D texture = this.isbnPhoto.texture as Texture2D;
-                    isbn_photo = texture.EncodeToPNG();
-                }
-
                 command.Parameters.Add("B_TITLE", OracleDbType.NVarchar2).Value = title.text;
                 command.Parameters.Add("B_AUTHOR", OracleDbType.NVarchar2).Value = author.text;
                 command.Parameters.Add("B_PUBLISHER", OracleDbType.NVarchar2).Value = publisher.text;
                 command.Parameters.Add("B_PRICE", OracleDbType.Decimal).Value = (string.IsNullOrEmpty(price)) ? DBNull.Value : price;
-                command.Parameters.Add("B_URL", OracleDbType.Varchar2).Value = (string.IsNullOrEmpty(url.text)) ? DBNull.Value : url.text;
+                command.Parameters.Add("B_URL", OracleDbType.Clob).Value = (string.IsNullOrEmpty(url.text)) ? DBNull.Value : url.text;
                 command.Parameters.Add("B_BOOKPHOTO", OracleDbType.Blob).Value = (book_photo == null) ? DBNull.Value : book_photo;
                 command.Parameters.Add("B_ISBN", OracleDbType.Decimal).Value = isbn.text;
-                command.Parameters.Add("B_ISBNPHOTO", OracleDbType.Blob).Value = (isbn_photo == null) ? DBNull.Value : isbn_photo;
-                command.Parameters.Add("B_DESCRIPTION", OracleDbType.NVarchar2).Value = (string.IsNullOrEmpty(description.text)) ? DBNull.Value : description.text;
+                command.Parameters.Add("B_DESCRIPTION", OracleDbType.Clob).Value = (string.IsNullOrEmpty(description.text)) ? DBNull.Value : description.text;
 
                 command.ExecuteNonQuery();
 
