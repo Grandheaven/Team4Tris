@@ -40,6 +40,8 @@ public class DynamicTableController4 : MonoBehaviour
     private GameObject selectedRowObject = null;
     private Color originalSelectedRowColor;
 
+    private string rentStatus;
+
     // BOOK 테이블 구조 매핑 + 대여상태 필드 추가
     public class DataRow
     {
@@ -97,10 +99,17 @@ public class DynamicTableController4 : MonoBehaviour
                     using (OracleCommand command = new OracleCommand(sql, connection))
                     using (OracleDataReader reader = command.ExecuteReader())
                     {
-                        System.Random rnd = new System.Random(); // 임시 랜덤 대여상태
-
+                        string sqlrent = "SELECT B.BNO, CASE WHEN RENT_STATUS.IS_RETURNED IS NULL THEN 'Y' ELSE RENT_STATUS.IS_RETURNED END AS IS_RETURNED FROM BOOK B LEFT JOIN(SELECT BNO, MIN(IS_RETURNED) AS IS_RETURNED FROM RENT GROUP BY BNO) RENT_STATUS ON B.BNO = RENT_STATUS.BNO ORDER BY B.BNO";
+                        OracleCommand commandrent = new OracleCommand(sqlrent, connection);
+                        OracleDataReader readerrent = commandrent.ExecuteReader();
+                        
                         while (reader.Read())
                         {
+                            if (readerrent.Read())
+                            {
+                                rentStatus = ReadString(readerrent["IS_RETURNED"]); 
+                            }
+
                             DataRow row = new DataRow
                             {
                                 bno = reader.GetInt32(reader.GetOrdinal("BNO")),
@@ -109,7 +118,7 @@ public class DynamicTableController4 : MonoBehaviour
                                 publisher = ReadString(reader["PUBLISHER"]),
                                 price = reader.IsDBNull(reader.GetOrdinal("PRICE")) ? 0 : reader.GetDouble(reader.GetOrdinal("PRICE")),
                                 isbn = reader.GetDecimal(reader.GetOrdinal("ISBN")),
-                                rent_status = rnd.Next(0, 2) == 0 ? "대여 가능" : "대여중" // 랜덤 표시
+                                rent_status = rentStatus == "Y" ? "대여 가능" : "대여중" // 랜덤 표시
                             };
                             tempData.Add(row);
                         }
@@ -279,7 +288,12 @@ public class DynamicTableController4 : MonoBehaviour
             return;
         }
 
-        popup3_DeleteConfirm.SetActive(true);
+        Page4_DB.delete = true;
+        Page4_DB.run = true;
+        Page4_DB.datatitle = selectedRow.title;
+        Page4_DB.dataauthor = selectedRow.author;
+        Page4_DB.datapublisher = selectedRow.publisher;
+        Page4_DB.dataprice = selectedRow.price.ToString();
     }
 
     private IEnumerator DeleteBookFromDB(DataRow rowToDelete)
