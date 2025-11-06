@@ -62,6 +62,10 @@ public class Page2_DB : MonoBehaviour
 
     public void MemberInformation()
     {
+        background1.SetActive(false);
+        background2.SetActive(false);
+        background3.SetActive(false);
+
         string tel = datatel.Replace("-", "").Replace(" ", "");
         tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
 

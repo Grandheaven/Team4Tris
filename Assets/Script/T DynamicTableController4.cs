@@ -219,6 +219,8 @@ public class DynamicTableController4 : MonoBehaviour
         if (selectedRowObject == rowObject)
         {
             popup1_Details.SetActive(true);
+            Page4_DB.run = true;
+            Page4_DB.dataisbn = selectedRow.isbn.ToString();
             return;
         }
 
@@ -265,6 +267,8 @@ public class DynamicTableController4 : MonoBehaviour
         }
 
         popup2_Modify.SetActive(true);
+        Page4_DB.run = true;
+        Page4_DB.dataisbn = selectedRow.isbn.ToString();
     }
 
     private void OnDeleteButtonClicked()
