@@ -206,11 +206,12 @@ MonoBehaviour:
   background1: {fileID: 34502550}
   background2: {fileID: 127992473}
   background3: {fileID: 987707444}
-  successUI: {fileID: 0}
-  alertUI: {fileID: 0}
-  alertText: {fileID: 0}
-  failUI: {fileID: 0}
-  failText: {fileID: 0}
+  successUI: {fileID: 1069645807}
+  alertUI: {fileID: 1257332826}
+  alertText: {fileID: 1908367604}
+  failUI: {fileID: 1192645629}
+  failText: {fileID: 119558470}
+  deleteUI: {fileID: 86934511}
 --- !u!1 &8365265
 GameObject:
   m_ObjectHideFlags: 0
@@ -3155,7 +3156,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 243396685}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 38.629}
+  m_LocalPosition: {x: 0, y: 0, z: 43}
   m_LocalScale: {x: 3.1117609, y: 4.182589, z: 0.000087046246}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7051,6 +7052,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 5429682}
+        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
+        m_MethodName: MemberDelete
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -12639,7 +12652,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1103460661}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5429682}
+        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
+        m_MethodName: SceneInit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1103460661
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14729,7 +14754,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1257332826}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15561,7 +15586,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1344007582}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5429682}
+        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
+        m_MethodName: SceneInit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1344007582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19715,6 +19752,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 5429682}
+        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
+        m_MethodName: MemberUpdate
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -24196,6 +24245,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5429682}
+        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
+        m_MethodName: SceneInit
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
