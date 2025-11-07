@@ -189,6 +189,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce6ee709a9cf3f94a92b73b2f8898691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  host: deu.duraka.shop
+  port: 4264
+  sid: xe
+  userid: TEAM4
+  password: Team4Tris
+  tableController: {fileID: 0}
   memberinfo: {fileID: 456193594}
   username: {fileID: 2032854471}
   birth: {fileID: 1369256777}
@@ -900,7 +906,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &54099618
 RectTransform:
   m_ObjectHideFlags: 0
@@ -965,7 +971,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &54099621
 Canvas:
   m_ObjectHideFlags: 0
@@ -4674,7 +4680,6 @@ GameObject:
   - component: {fileID: 402847067}
   - component: {fileID: 402847066}
   - component: {fileID: 402847065}
-  - component: {fileID: 402847064}
   m_Layer: 0
   m_Name: "\uD655\uC778\uBC84\uD2BC"
   m_TagString: Untagged
@@ -4703,21 +4708,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -0.34291077}
   m_SizeDelta: {x: 50, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &402847064
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 402847062}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c525fc88942e2948b6004f7d98f2f3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetPopup: {fileID: 86934511}
-  guideMessage: {fileID: 86934511}
-  otherButton: {fileID: 0}
 --- !u!114 &402847065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4761,7 +4751,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 402847066}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 883575218}
+        m_TargetAssemblyTypeName: Page2, Assembly-CSharp
+        m_MethodName: Click
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &402847066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13963,7 +13965,7 @@ GameObject:
   - component: {fileID: 1192645632}
   - component: {fileID: 1192645631}
   m_Layer: 0
-  m_Name: "\uC218\uC815 \uC2E4\uD328 \uD31D\uC5C5\uCC3D"
+  m_Name: "\uC218\uC815 \uCDE8\uC18C \uD31D\uC5C5\uCC3D"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15514,7 +15516,6 @@ GameObject:
   - component: {fileID: 1344007583}
   - component: {fileID: 1344007582}
   - component: {fileID: 1344007581}
-  - component: {fileID: 1344007584}
   m_Layer: 0
   m_Name: "\uD655\uC778\uBC84\uD2BC"
   m_TagString: Untagged
@@ -15587,9 +15588,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5429682}
-        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
-        m_MethodName: SceneInit
+      - m_Target: {fileID: 883575218}
+        m_TargetAssemblyTypeName: Page2, Assembly-CSharp
+        m_MethodName: Click
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15637,21 +15638,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1344007579}
   m_CullTransparentMesh: 1
---- !u!114 &1344007584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1344007579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c525fc88942e2948b6004f7d98f2f3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetPopup: {fileID: 1192645629}
-  guideMessage: {fileID: 54099617}
-  otherButton: {fileID: 1069645807}
 --- !u!1 &1352903262
 GameObject:
   m_ObjectHideFlags: 0
@@ -24241,21 +24227,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 456193594}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 5429682}
-        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
-        m_MethodName: SceneInit
+      - m_Target: {fileID: 883575218}
+        m_TargetAssemblyTypeName: Page2, Assembly-CSharp
+        m_MethodName: Click
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25582,7 +25556,6 @@ GameObject:
   - component: {fileID: 2042285640}
   - component: {fileID: 2042285639}
   - component: {fileID: 2042285638}
-  - component: {fileID: 2042285641}
   m_Layer: 0
   m_Name: "\uD655\uC778\uBC84\uD2BC"
   m_TagString: Untagged
@@ -25655,9 +25628,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5429682}
-        m_TargetAssemblyTypeName: Page2_DB, Assembly-CSharp
-        m_MethodName: SceneInit
+      - m_Target: {fileID: 883575218}
+        m_TargetAssemblyTypeName: Page2, Assembly-CSharp
+        m_MethodName: Click
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25705,21 +25678,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2042285636}
   m_CullTransparentMesh: 1
---- !u!114 &2042285641
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2042285636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c525fc88942e2948b6004f7d98f2f3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetPopup: {fileID: 1069645807}
-  guideMessage: {fileID: 54099617}
-  otherButton: {fileID: 1192645629}
 --- !u!1 &2051770114
 GameObject:
   m_ObjectHideFlags: 0
