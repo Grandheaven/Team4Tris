@@ -277,31 +277,78 @@ public class Page4_DB : MonoBehaviour
         try
         {
             connection.Open();
-            OracleCommand command = new OracleCommand("DELETE_BOOK", connection);
-            command.CommandType = CommandType.StoredProcedure;
 
-            string price = dataprice.Replace(",", "").Replace("원", "");
+            // 1. ISBN을 사용하여 BNO를 조회합니다. (datatitle 등으로 DELETE 하는 것은 위험합니다.)
+            string selectBnoSql = $"SELECT BNO FROM BOOK WHERE ISBN = :isbn";
+            OracleCommand bnoCommand = new OracleCommand(selectBnoSql, connection);
+            bnoCommand.Parameters.Add("isbn", OracleDbType.Decimal).Value = dataisbn;
+            object bnoResult = bnoCommand.ExecuteScalar();
 
-            command.Parameters.Add("B_TITLE", OracleDbType.NVarchar2).Value = datatitle;
-            command.Parameters.Add("B_AUTHOR", OracleDbType.NVarchar2).Value = dataauthor;
-            command.Parameters.Add("B_PUBLISHER", OracleDbType.NVarchar2).Value = datapublisher;
-            command.Parameters.Add("B_PRICE", OracleDbType.Decimal).Value = (string.IsNullOrEmpty(price)) ? DBNull.Value : price;
+            if (bnoResult == null || bnoResult == DBNull.Value)
+            {
+                failText.text = "삭제할 도서 정보를 찾을 수 없습니다.";
+                failUI.SetActive(true);
+                return;
+            }
+            decimal bno = Convert.ToDecimal(bnoResult);
 
-            command.ExecuteNonQuery();
+            // 2. 해당 BNO로 RENT 테이블에서 IS_RETURNED가 'N'인 레코드가 있는지 확인합니다.
+            string checkRentSql = $"SELECT COUNT(*) FROM RENT WHERE BNO = :bno AND IS_RETURNED = 'N'";
+            OracleCommand checkRentCommand = new OracleCommand(checkRentSql, connection);
+            checkRentCommand.Parameters.Add("bno", OracleDbType.Decimal).Value = bno;
+            int activeRents = Convert.ToInt32(checkRentCommand.ExecuteScalar());
 
-            deleteUI.SetActive(true);
+            if (activeRents > 0)
+            {
+                // 활성 대여(IS_RETURNED = 'N')가 존재하면 삭제 불가
+                alertUI.SetActive(true);
+                deleteUI.SetActive(false);
+                failText.text = "현재 대여 중인 도서는 삭제할 수 없습니다.";
+                failUI.SetActive(true);
+                return;
+            }
+
+            // 3. (옵션) IS_RETURNED가 모두 'Y'이거나 대여 기록이 없으면, RENT 테이블에서 BNO 필드를 NULL로 업데이트 (선택적)
+            // RENT 테이블의 BNO를 NULL로 업데이트하는 대신, 해당 RENT 레코드를 삭제하거나 BNO NULL 처리를 생략하는 것이 더 일반적입니다.
+            // 하지만 요청에 따라 'BNO를 NULL 값으로 지운 후'를 구현합니다.
+
+            // RENT 테이블의 BNO를 NULL로 설정 (BNO가 NULLABLE이므로 가능)
+            string updateRentSql = $"UPDATE RENT SET BNO = NULL WHERE BNO = :bno";
+            OracleCommand updateRentCommand = new OracleCommand(updateRentSql, connection);
+            updateRentCommand.Parameters.Add("bno", OracleDbType.Decimal).Value = bno;
+            updateRentCommand.ExecuteNonQuery();
+
+
+            // 4. BOOK 테이블에서 도서 삭제
+            string deleteBookSql = $"DELETE FROM BOOK WHERE BNO = :bno";
+            OracleCommand deleteBookCommand = new OracleCommand(deleteBookSql, connection);
+            deleteBookCommand.Parameters.Add("bno", OracleDbType.Decimal).Value = bno;
+            deleteBookCommand.ExecuteNonQuery();
+
+            deleteUI.SetActive(true); // 성공 팝업
+
+            
         }
-        catch (Exception ex) // DB 연결 실패 시 예외 처리
+        catch (Exception ex) // DB 연결 또는 기타 예외 처리
         {
-            alertUI.SetActive(true);
+            Debug.LogError("Database delete failed: " + ex.Message);
+            failText.text = "데이터베이스 오류가 발생했습니다: " + ex.Message;
+            failUI.SetActive(true);
             deleteUI.SetActive(false);
+            alertUI.SetActive(true);
         }
         finally
         {
             connection.Close();
             Debug.Log("Database connection closed.");
+            run = false; // BookDelete 실행 완료
+            delete = false; // delete 플래그 초기화
         }
     }
+
+    // 참고: BookDelete()의 맨 위에 있던 public void BookDelete() { ... } 내부에서 
+    // 배경 UI 끄는 부분 아래에 Page4_DB.run = false; 와 Page4_DB.delete = false; 를 추가해줘야
+    // Update() 루프가 종료될 것입니다.
 
     private string ReadString(object dbValue)
     {

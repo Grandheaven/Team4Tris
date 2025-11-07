@@ -15979,7 +15979,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: x
+  m_text: O
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
   m_sharedMaterial: {fileID: -3363149638184688338, guid: 0136ac9cf3aa054489d0e52be820725d, type: 2}
@@ -15988,8 +15988,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4282405887
-  m_fontColor: {r: 1, g: 0.3263932, b: 0.2509804, a: 1}
+    rgba: 4294923072
+  m_fontColor: {r: 0.2509804, g: 0.3263932, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -24378,9 +24378,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2020332417}
-        m_TargetAssemblyTypeName: Page4_DB, Assembly-CSharp
-        m_MethodName: SceneInit
+      - m_Target: {fileID: 883575221}
+        m_TargetAssemblyTypeName: Page4, Assembly-CSharp
+        m_MethodName: Click
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
