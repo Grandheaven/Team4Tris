@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using System.Data;
 using System.Collections;
@@ -9,21 +9,24 @@ using UnityEngine.UI;
 
 public class Page2_DB : MonoBehaviour
 {
-    private string host = "deu.duraka.shop";
-    private string port = "4264";
-    private string sid = "xe";
-    private string userid = "TEAM4";
-    private string password = "Team4Tris";
+    [SerializeField] private string host = "deu.duraka.shop";
+    [SerializeField] private string port = "4264";
+    [SerializeField] private string sid = "xe";
+    [SerializeField] private string userid = "TEAM4";
+    [SerializeField] private string password = "Team4Tris";
 
     private string savetel;
     private string saveemail;
 
     static public bool run = false;
     static public bool delete = false;
+    static public bool isDeleted = false;
     static public string dataname;
     static public string databirth;
     static public string datasex;
     static public string datatel;
+
+    public DynamicTableController tableController;
 
     [Header("MemberInformation Object")]
     public GameObject memberinfo;
@@ -54,14 +57,22 @@ public class Page2_DB : MonoBehaviour
     public TMP_Text failText;
     public GameObject deleteUI;
 
+    [Header("delete error")]
+    public GameObject failDeleteUI;     // ğŸŒŸ ì‚­ì œ ì‹¤íŒ¨ ì‹œ ë„ìš¸ ìƒˆë¡œìš´ íŒì—…
+
     void Update()
     {
-        if (memberinfo.activeInHierarchy && run)
+        if (tableController == null)
+        {
+            tableController = FindObjectOfType<DynamicTableController>();
+        }
+
+        if (memberinfo != null && memberinfo.activeInHierarchy && run)
         {
             MemberInformation();
             run = false;
         }
-        if (memberinfo2.activeInHierarchy && run)
+        if (memberinfo2 != null && memberinfo2.activeInHierarchy && run)
         {
             MemberModify();
             run = false;
@@ -75,374 +86,515 @@ public class Page2_DB : MonoBehaviour
 
     public void MemberInformation()
     {
-        background1.SetActive(false);
-        background2.SetActive(false);
-        background3.SetActive(false);
+        if (background1 != null) background1.SetActive(false);
+        if (background2 != null) background2.SetActive(false);
+        if (background3 != null) background3.SetActive(false);
+
+        if (string.IsNullOrEmpty(datatel))
+        {
+            Debug.LogError("datatel ê°’ì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+            return;
+        }
 
         string tel = datatel.Replace("-", "").Replace(" ", "");
         tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
 
         string connString = $"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SID={sid})));User Id={userid};Password={password};";
-        OracleConnection connection = new OracleConnection(connString);
-        try
+        using (OracleConnection connection = new OracleConnection(connString))
         {
-            connection.Open();
-            string sql = $"SELECT NAME, BIRTH, SEX, TEL, EMAIL, PHOTO FROM MEMBER WHERE TEL = {tel}"; // ½ÇÁ¦ Å×ÀÌºí ÀÌ¸§À¸·Î º¯°æ
-            OracleCommand command = new OracleCommand(sql, connection);
-            OracleDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                username.text = ReadString(reader["NAME"]);
-                birth.text = ReadString(reader["BIRTH"]);
-                sex.text = ReadString(reader["SEX"]) == "M" ? "³²¼º" : "¿©¼º";
-                this.tel.text = datatel;
-                email.text = ReadString(reader["EMAIL"]);
-
-                if (reader["PHOTO"] != DBNull.Value)
+                connection.Open();
+                string sql = $"SELECT NAME, BIRTH, SEX, TEL, EMAIL, PHOTO FROM MEMBER WHERE TEL = '{tel}'";
+                OracleCommand command = new OracleCommand(sql, connection);
+                using (OracleDataReader reader = command.ExecuteReader())
                 {
-                    byte[] imageData = (byte[])reader["PHOTO"];
-
-                    if (imageData != null && imageData.Length > 0)
+                    if (reader.Read())
                     {
-                        Texture2D texture = new Texture2D(2, 2);
-                        if (texture.LoadImage(imageData))
+                        if (username != null) username.text = ReadString(reader["NAME"]);
+                        if (birth != null && reader["BIRTH"] != DBNull.Value)
                         {
-                            photo.texture = texture;
-                            photo.color = Color.white;
+                            // DBì—ì„œ DateTimeìœ¼ë¡œ ì½ì–´ì™€ "yyyy-MM-dd" í˜•ì‹ìœ¼ë¡œ ë³€í™˜
+                            DateTime birthDate = reader.GetDateTime(reader.GetOrdinal("BIRTH"));
+                            birth.text = birthDate.ToString("yyyy-MM-dd");
                         }
-                        else
+                        else if (birth != null)
                         {
-                            Debug.LogError("ÀÌ¹ÌÁö µ¥ÀÌÅÍ ·Îµå ½ÇÆĞ: byte[]°¡ À¯È¿ÇÑ ÀÌ¹ÌÁö Çü½ÄÀÌ ¾Æ´Õ´Ï´Ù.");
+                            birth.text = string.Empty;
+                        }
+                        if (sex != null) sex.text = ReadString(reader["SEX"]) == "M" ? "ë‚¨ì„±" : "ì—¬ì„±";
+                        if (this.tel != null) this.tel.text = datatel;
+                        if (email != null) email.text = ReadString(reader["EMAIL"]);
+
+                        if (photo != null && reader["PHOTO"] != DBNull.Value)
+                        {
+                            byte[] imageData = (byte[])reader["PHOTO"];
+                            if (imageData != null && imageData.Length > 0)
+                            {
+                                Texture2D texture = new Texture2D(2, 2);
+                                if (texture.LoadImage(imageData))
+                                {
+                                    photo.texture = texture;
+                                    photo.color = Color.white;
+                                }
+                                else
+                                {
+                                    Debug.LogError("ì´ë¯¸ì§€ ë°ì´í„° ë¡œë“œ ì‹¤íŒ¨: byte[]ê°€ ìœ íš¨í•œ ì´ë¯¸ì§€ í˜•ì‹ì´ ì•„ë‹™ë‹ˆë‹¤.");
+                                    photo.texture = null;
+                                }
+                            }
+                            else
+                            {
+                                photo.texture = null;
+                            }
+                        }
+                        else if (photo != null)
+                        {
                             photo.texture = null;
                         }
                     }
-                    else
-                    {
-                        photo.texture = null;
-                    }
-                }
-                else
-                {
-                    photo.texture = null;
                 }
             }
-        }
-        catch (Exception ex) // DB ¿¬°á ½ÇÆĞ ½Ã ¿¹¿Ü Ã³¸®
-        {
-            Debug.LogError("Database connection failed: " + ex.Message);
-        }
-        finally
-        {
-            connection.Close();
-            Debug.Log("Database connection closed.");
+            catch (Exception ex)
+            {
+                Debug.LogError("Database connection failed: " + ex.Message);
+            }
+            finally
+            {
+                Debug.Log("Database connection closed.");
+            }
         }
     }
 
     public void MemberModify()
     {
-        background1.SetActive(false);
-        background2.SetActive(false);
-        background3.SetActive(false);
+        if (background1 != null) background1.SetActive(false);
+        if (background2 != null) background2.SetActive(false);
+        if (background3 != null) background3.SetActive(false);
+
+        if (string.IsNullOrEmpty(datatel))
+        {
+            Debug.LogError("datatel ê°’ì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+            return;
+        }
 
         string tel = datatel.Replace("-", "").Replace(" ", "");
         tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
 
         string connString = $"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SID={sid})));User Id={userid};Password={password};";
-        OracleConnection connection = new OracleConnection(connString);
-        try
+        using (OracleConnection connection = new OracleConnection(connString))
         {
-            connection.Open();
-            string sql = $"SELECT NAME, BIRTH, SEX, TEL, EMAIL, PHOTO FROM MEMBER WHERE TEL = {tel}"; // ½ÇÁ¦ Å×ÀÌºí ÀÌ¸§À¸·Î º¯°æ
-            OracleCommand command = new OracleCommand(sql, connection);
-            OracleDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            try
             {
-                username2.text = ReadString(reader["NAME"]);
-                birth2.text = ReadString(reader["BIRTH"]);
-                sex2.text = ReadString(reader["SEX"]) == "M" ? "³²¼º" : "¿©¼º";
-                this.tel2.text = datatel;
-                email2.text = ReadString(reader["EMAIL"]);
-
-                if (reader["PHOTO"] != DBNull.Value)
+                connection.Open();
+                string sql = $"SELECT NAME, BIRTH, SEX, TEL, EMAIL, PHOTO FROM MEMBER WHERE TEL = '{tel}'";
+                OracleCommand command = new OracleCommand(sql, connection);
+                using (OracleDataReader reader = command.ExecuteReader())
                 {
-                    byte[] imageData = (byte[])reader["PHOTO"];
-
-                    if (imageData != null && imageData.Length > 0)
+                    if (reader.Read())
                     {
-                        Texture2D texture = new Texture2D(2, 2);
-                        if (texture.LoadImage(imageData))
+                        if (username2 != null) username2.text = ReadString(reader["NAME"]);
+                        if (birth2 != null && reader["BIRTH"] != DBNull.Value)
                         {
-                            photo2.texture = texture;
-                            photo2.color = Color.white;
+                            // DBì—ì„œ DateTimeìœ¼ë¡œ ì½ì–´ì™€ "yyyy-MM-dd" í˜•ì‹ìœ¼ë¡œ ë³€í™˜
+                            DateTime birthDate = reader.GetDateTime(reader.GetOrdinal("BIRTH"));
+                            birth2.text = birthDate.ToString("yyyy-MM-dd");
                         }
-                        else
+                        else if (birth2 != null)
                         {
-                            Debug.LogError("ÀÌ¹ÌÁö µ¥ÀÌÅÍ ·Îµå ½ÇÆĞ: byte[]°¡ À¯È¿ÇÑ ÀÌ¹ÌÁö Çü½ÄÀÌ ¾Æ´Õ´Ï´Ù.");
+                            birth2.text = string.Empty;
+                        }
+                        if (sex2 != null) sex2.text = ReadString(reader["SEX"]) == "M" ? "ë‚¨ì„±" : "ì—¬ì„±";
+                        if (this.tel2 != null) this.tel2.text = datatel;
+                        if (email2 != null) email2.text = ReadString(reader["EMAIL"]);
+
+                        if (photo2 != null && reader["PHOTO"] != DBNull.Value)
+                        {
+                            byte[] imageData = (byte[])reader["PHOTO"];
+                            if (imageData != null && imageData.Length > 0)
+                            {
+                                Texture2D texture = new Texture2D(2, 2);
+                                if (texture.LoadImage(imageData))
+                                {
+                                    photo2.texture = texture;
+                                    photo2.color = Color.white;
+                                }
+                                else
+                                {
+                                    Debug.LogError("ì´ë¯¸ì§€ ë°ì´í„° ë¡œë“œ ì‹¤íŒ¨: byte[]ê°€ ìœ íš¨í•œ ì´ë¯¸ì§€ í˜•ì‹ì´ ì•„ë‹™ë‹ˆë‹¤.");
+                                    photo2.texture = null;
+                                }
+                            }
+                            else
+                            {
+                                photo2.texture = null;
+                            }
+                        }
+                        else if (photo2 != null)
+                        {
                             photo2.texture = null;
                         }
                     }
-                    else
-                    {
-                        photo2.texture = null;
-                    }
-                }
-                else
-                {
-                    photo2.texture = null;
                 }
             }
-        }
-        catch (Exception ex) // DB ¿¬°á ½ÇÆĞ ½Ã ¿¹¿Ü Ã³¸®
-        {
-            Debug.LogError("Database connection failed: " + ex.Message);
-        }
-        finally
-        {
-            connection.Close();
-            Debug.Log("Database connection closed.");
+            catch (Exception ex)
+            {
+                Debug.LogError("Database connection failed: " + ex.Message);
+            }
+            finally
+            {
+                Debug.Log("Database connection closed.");
 
-            savetel = tel2.text;
-            saveemail = email2.text;
+                if (tel2 != null) savetel = tel2.text;
+                if (email2 != null) saveemail = email2.text;
+            }
         }
     }
 
     public void DataBaseConnection()
     {
         string connString = $"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SID={sid})));User Id={userid};Password={password};";
-        OracleConnection connection = new OracleConnection(connString);
-        try
+        using (OracleConnection connection = new OracleConnection(connString))
         {
-            connection.Open();
-            OracleCommand command = new OracleCommand("UPDATE_MEMBER", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
             try
             {
+                connection.Open();
+                OracleCommand command = new OracleCommand("UPDATE_MEMBER", connection);
+                command.CommandType = CommandType.StoredProcedure;
+
+                if (username2 == null || string.IsNullOrWhiteSpace(username2.text) ||
+                    birth2 == null || string.IsNullOrWhiteSpace(birth2.text) ||
+                    sex2 == null || string.IsNullOrWhiteSpace(sex2.text) ||
+                    tel2 == null || string.IsNullOrWhiteSpace(tel2.text))
+                {
+                    if (alertText != null) alertText.text = "í•„ìˆ˜ ì…ë ¥ í•­ëª©ì´ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.";
+                    if (alertUI != null) alertUI.SetActive(true);
+                    return;
+                }
+
                 byte[] photo = null;
-                if (this.photo2.texture != null)
+                if (this.photo2 != null && this.photo2.texture != null)
                 {
                     Texture2D texture = this.photo2.texture as Texture2D;
-                    photo = texture.EncodeToPNG();
+                    if (texture != null)
+                    {
+                        photo = texture.EncodeToPNG();
+                    }
                 }
 
                 DateTime birth;
                 if (!DateTime.TryParse(this.birth2.text, out birth))
                 {
-                    failText.text = "»ı³â¿ùÀÏ ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
+                    if (failText != null) failText.text = "ìƒë…„ì›”ì¼ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
+                    if (failUI != null) failUI.SetActive(true);
                     return;
                 }
 
-                char sex = char.ToUpper(this.sex2.text[0]);
-                if (sex == 'M' || sex == '³²')
+                char sex;
+                string sexInput = this.sex2.text.Trim().ToUpper();
+                if (sexInput.StartsWith("M") || sexInput.StartsWith("ë‚¨"))
                 {
                     sex = 'M';
                 }
-                else if (sex == 'F' || sex == 'W' || sex == '¿©')
+                else if (sexInput.StartsWith("F") || sexInput.StartsWith("W") || sexInput.StartsWith("ì—¬"))
                 {
                     sex = 'F';
                 }
                 else
                 {
-                    failText.text = "¼ºº° ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
+                    if (failText != null) failText.text = "ì„±ë³„ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
+                    if (failUI != null) failUI.SetActive(true);
                     return;
                 }
 
                 string tel = this.tel2.text.Replace("-", "").Replace(" ", "");
                 tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
-                OracleCommand telselect = new OracleCommand($"SELECT * FROM MEMBER WHERE TEL = {tel}", connection);
-                OracleDataReader reader = telselect.ExecuteReader();
-                if (reader.HasRows)
+
+                using (OracleCommand telselect = new OracleCommand($"SELECT COUNT(*) FROM MEMBER WHERE TEL = '{tel}'", connection))
                 {
-                    failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀüÈ­¹øÈ£ÀÔ´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
-                    return;
+                    if (Convert.ToInt32(telselect.ExecuteScalar()) > 0)
+                    {
+                        if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì „í™”ë²ˆí˜¸ì…ë‹ˆë‹¤.";
+                        if (failUI != null) failUI.SetActive(true);
+                        return;
+                    }
                 }
 
-                OracleCommand emailselect = new OracleCommand($"SELECT * FROM MEMBER WHERE EMAIL = '{email2.text}'", connection);
-                reader = emailselect.ExecuteReader();
-                if (reader.HasRows)
+                if (!string.IsNullOrEmpty(email2.text))
                 {
-                    failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀÌ¸ŞÀÏÀÔ´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
-                    return;
+                    using (OracleCommand emailselect = new OracleCommand($"SELECT COUNT(*) FROM MEMBER WHERE EMAIL = '{email2.text.Trim()}'", connection))
+                    {
+                        if (Convert.ToInt32(emailselect.ExecuteScalar()) > 0)
+                        {
+                            if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì´ë©”ì¼ì…ë‹ˆë‹¤.";
+                            if (failUI != null) failUI.SetActive(true);
+                            return;
+                        }
+                    }
                 }
 
                 command.Parameters.Add("M_NAME", OracleDbType.NVarchar2).Value = username2.text;
                 command.Parameters.Add("M_BIRTH", OracleDbType.Date).Value = birth;
                 command.Parameters.Add("M_SEX", OracleDbType.Char).Value = sex;
-                command.Parameters.Add("M_TEL", OracleDbType.Decimal).Value = tel;
+                command.Parameters.Add("M_TEL", OracleDbType.Varchar2).Value = tel;
                 command.Parameters.Add("M_EMAIL", OracleDbType.Varchar2).Value = (string.IsNullOrEmpty(email2.text)) ? DBNull.Value : email2.text;
                 command.Parameters.Add("M_PHOTO", OracleDbType.Blob).Value = (photo == null) ? DBNull.Value : photo;
 
                 command.ExecuteNonQuery();
 
-                successUI.SetActive(true);
+                if (successUI != null) successUI.SetActive(true);
             }
             catch (Exception ex)
             {
-                alertText.text = "ºóÄ­ÀÌ Á¸ÀçÇÏ°Å³ª\nÀÔ·Â Çü½ÄÀÌ Àß¸øµÇ¾ú½À´Ï´Ù.";
-                alertUI.SetActive(true);
+                Debug.LogError($"DB ë“±ë¡/ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ ë°œìƒ: {ex.Message}");
+                if (alertText != null) alertText.text = "ë“±ë¡/ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.\n" + ex.Message;
+                if (alertUI != null) alertUI.SetActive(true);
             }
-        }
-        catch (Exception ex)
-        {
-            failText.text = "DB ¿¬°á¿¡ ½ÇÆĞÇß½À´Ï´Ù.";
-            failUI.SetActive(true);
-        }
-        finally
-        {
-            connection.Close();
+            finally
+            {
+                Debug.Log("Database connection closed.");
+                if (tableController != null)
+                {
+                    tableController.RefreshTable();
+                }
+            }
         }
     }
 
     public void MemberUpdate()
     {
         string connString = $"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SID={sid})));User Id={userid};Password={password};";
-        OracleConnection connection = new OracleConnection(connString);
-        try
+        using (OracleConnection connection = new OracleConnection(connString))
         {
-            connection.Open();
-            OracleCommand command = new OracleCommand("UPDATE_MEMBER", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            string sql = $"SELECT MNO FROM MEMBER WHERE TEL = {savetel}";
-            OracleCommand mno = new OracleCommand(sql, connection);
-            OracleDataReader reader = mno.ExecuteReader();
-
             try
             {
+                connection.Open();
+                OracleCommand command = new OracleCommand("UPDATE_MEMBER", connection);
+                command.CommandType = CommandType.StoredProcedure;
+
+                string cleanSavetel = savetel.Replace("-", "").Replace(" ", "");
+                cleanSavetel = cleanSavetel.StartsWith("0") ? cleanSavetel.Substring(1) : cleanSavetel;
+
+                string sql = $"SELECT MNO FROM MEMBER WHERE TEL = '{cleanSavetel}'";
+                OracleCommand mnoCommand = new OracleCommand(sql, connection);
+                object mnoResult = mnoCommand.ExecuteScalar();
+
+                decimal? memberMno = null;
+                if (mnoResult != null && mnoResult != DBNull.Value)
+                {
+                    memberMno = Convert.ToDecimal(mnoResult);
+                }
+
+                if (memberMno == null)
+                {
+                    Debug.LogError("ìˆ˜ì •í•  ë©¤ë²„ì˜ MNOë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                    if (failText != null) failText.text = "ìˆ˜ì •í•  íšŒì› ì •ë³´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.";
+                    if (failUI != null) failUI.SetActive(true);
+                    return;
+                }
+
+                if (username2 == null || string.IsNullOrWhiteSpace(username2.text) ||
+                    birth2 == null || string.IsNullOrWhiteSpace(birth2.text) ||
+                    sex2 == null || string.IsNullOrWhiteSpace(sex2.text) ||
+                    tel2 == null || string.IsNullOrWhiteSpace(tel2.text))
+                {
+                    if (alertText != null) alertText.text = "í•„ìˆ˜ ì…ë ¥ í•­ëª©ì´ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.";
+                    if (alertUI != null) alertUI.SetActive(true);
+                    return;
+                }
+
                 byte[] photo = null;
-                if (this.photo2.texture != null)
+                if (this.photo2 != null && this.photo2.texture != null)
                 {
                     Texture2D texture = this.photo2.texture as Texture2D;
-                    photo = texture.EncodeToPNG();
+                    if (texture != null)
+                    {
+                        photo = texture.EncodeToPNG();
+                    }
                 }
 
                 DateTime birth;
                 if (!DateTime.TryParse(this.birth2.text, out birth))
                 {
-                    failText.text = "»ı³â¿ùÀÏ ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
+                    if (failText != null) failText.text = "ìƒë…„ì›”ì¼ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
+                    if (failUI != null) failUI.SetActive(true);
                     return;
                 }
 
-                char sex = char.ToUpper(this.sex2.text[0]);
-                if (sex == 'M' || sex == '³²')
+                char sex;
+                string sexInput = this.sex2.text.Trim().ToUpper();
+                if (sexInput.StartsWith("M") || sexInput.StartsWith("ë‚¨"))
                 {
                     sex = 'M';
                 }
-                else if (sex == 'F' || sex == 'W' || sex == '¿©')
+                else if (sexInput.StartsWith("F") || sexInput.StartsWith("W") || sexInput.StartsWith("ì—¬"))
                 {
                     sex = 'F';
                 }
                 else
                 {
-                    failText.text = "¼ºº° ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
+                    if (failText != null) failText.text = "ì„±ë³„ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
+                    if (failUI != null) failUI.SetActive(true);
                     return;
                 }
 
                 string tel = this.tel2.text.Replace("-", "").Replace(" ", "");
                 tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
-                OracleCommand telselect = new OracleCommand($"SELECT * FROM MEMBER WHERE TEL = {tel}", connection);
-                OracleDataReader telreader = telselect.ExecuteReader();
-                if (telreader.HasRows && savetel != tel2.text)
+
+                if (cleanSavetel != tel)
                 {
-                    failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀüÈ­¹øÈ£ÀÔ´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
-                    return;
+                    using (OracleCommand telselect = new OracleCommand($"SELECT COUNT(*) FROM MEMBER WHERE TEL = '{tel}' AND MNO != {memberMno.Value}", connection))
+                    {
+                        if (Convert.ToInt32(telselect.ExecuteScalar()) > 0)
+                        {
+                            if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì „í™”ë²ˆí˜¸ì…ë‹ˆë‹¤.";
+                            if (failUI != null) failUI.SetActive(true);
+                            return;
+                        }
+                    }
                 }
 
-                OracleCommand emailselect = new OracleCommand($"SELECT * FROM MEMBER WHERE EMAIL = '{email2.text}'", connection);
-                reader = emailselect.ExecuteReader();
-                if (reader.HasRows && saveemail != email2.text)
+                if (!string.IsNullOrEmpty(email2.text) && saveemail != email2.text)
                 {
-                    failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀÌ¸ŞÀÏÀÔ´Ï´Ù.";
-                    failUI.SetActive(true);
-                    connection.Close();
-                    return;
+                    using (OracleCommand emailselect = new OracleCommand($"SELECT COUNT(*) FROM MEMBER WHERE EMAIL = '{email2.text.Trim()}' AND MNO != {memberMno.Value}", connection))
+                    {
+                        if (Convert.ToInt32(emailselect.ExecuteScalar()) > 0)
+                        {
+                            if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì´ë©”ì¼ì…ë‹ˆë‹¤.";
+                            if (failUI != null) failUI.SetActive(true);
+                            return;
+                        }
+                    }
                 }
 
-                if (reader.Read()) command.Parameters.Add("M_MNO", OracleDbType.Decimal).Value = ReadString(reader["MNO"]);
+                command.Parameters.Add("M_MNO", OracleDbType.Decimal).Value = memberMno.Value;
                 command.Parameters.Add("M_NAME", OracleDbType.NVarchar2).Value = username2.text;
                 command.Parameters.Add("M_BIRTH", OracleDbType.Date).Value = birth;
                 command.Parameters.Add("M_SEX", OracleDbType.Char).Value = sex;
-                command.Parameters.Add("M_TEL", OracleDbType.Decimal).Value = tel;
-                command.Parameters.Add("M_EMAIL", OracleDbType.Varchar2).Value = (string.IsNullOrEmpty(email2.text)) ? DBNull.Value : email.text;
+                command.Parameters.Add("M_TEL", OracleDbType.Varchar2).Value = tel;
+                command.Parameters.Add("M_EMAIL", OracleDbType.Varchar2).Value = (string.IsNullOrEmpty(email2.text)) ? DBNull.Value : email2.text;
                 command.Parameters.Add("M_PHOTO", OracleDbType.Blob).Value = (photo == null) ? DBNull.Value : photo;
 
                 command.ExecuteNonQuery();
 
-                successUI.SetActive(true);
+                if (successUI != null) successUI.SetActive(true);
             }
             catch (Exception ex)
             {
-                alertText.text = "ºóÄ­ÀÌ Á¸ÀçÇÏ°Å³ª\nÀÔ·Â Çü½ÄÀÌ Àß¸øµÇ¾ú½À´Ï´Ù.";
-                alertUI.SetActive(true);
-                successUI.SetActive(false);
+                Debug.LogError($"DB ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ ë°œìƒ: {ex.Message}");
+                if (alertText != null) alertText.text = "ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.\n" + ex.Message;
+                if (alertUI != null) alertUI.SetActive(true);
+                if (successUI != null) successUI.SetActive(false);
             }
-        }
-        catch (Exception ex) // DB ¿¬°á ½ÇÆĞ ½Ã ¿¹¿Ü Ã³¸®
-        {
-            Debug.LogError("Database connection failed: " + ex.Message);
-        }
-        finally
-        {
-            connection.Close();
-            Debug.Log("Database connection closed.");
+            finally
+            {
+                Debug.Log("Database connection closed.");
+                if (tableController != null)
+                {
+                    tableController.RefreshTable();
+                }
+            }
         }
     }
 
     public void MemberDelete()
     {
-        Debug.Log(dataname + "!!");
-        Debug.Log(databirth + "!!");
-        Debug.Log(datasex + "!!");
-        Debug.Log(datatel + "!!");
+        Debug.Log($"ì‚­ì œ(Soft Delete) ì‹œë„: {dataname} ({datatel})");
 
-        background1.SetActive(false);
-        background2.SetActive(false);
-        background3.SetActive(false);
+        if (background1 != null) background1.SetActive(false);
+        if (background2 != null) background2.SetActive(false);
+        if (background3 != null) background3.SetActive(false);
 
         string connString = $"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SID={sid})));User Id={userid};Password={password};";
-        OracleConnection connection = new OracleConnection(connString);
-
-        string tel = datatel.Replace("-", "").Replace(" ", "");
-        tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
-
-        try
+        using (OracleConnection connection = new OracleConnection(connString))
         {
-            connection.Open();
-            OracleCommand command = new OracleCommand("DELETE_MEMBER", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            if (string.IsNullOrEmpty(datatel))
+            {
+                Debug.LogError("ì‚­ì œí•  íšŒì› ì „í™”ë²ˆí˜¸(datatel)ê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+                if (alertText != null) alertText.text = "ì‚­ì œí•  íšŒì› ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤.";
+                if (alertUI != null) alertUI.SetActive(true);
+                delete = false;
+                return;
+            }
 
-            command.Parameters.Add("M_NAME", OracleDbType.NVarchar2).Value = dataname;
-            command.Parameters.Add("M_BIRTH", OracleDbType.Date).Value = databirth;
-            command.Parameters.Add("M_SEX", OracleDbType.Char).Value = datasex == "³²¼º" ? "M" : "F";
-            command.Parameters.Add("M_TEL", OracleDbType.Decimal).Value = (string.IsNullOrEmpty(tel)) ? DBNull.Value : tel;
+            string tel = datatel.Replace("-", "").Replace(" ", "");
+            tel = tel.StartsWith("0") ? tel.Substring(1) : tel;
 
-            command.ExecuteNonQuery();
+            try
+            {
+                connection.Open();
 
-            deleteUI.SetActive(true);
-        }
-        catch (Exception ex) // DB ¿¬°á ½ÇÆĞ ½Ã ¿¹¿Ü Ã³¸®
-        {
-            alertUI.SetActive(true);
-            deleteUI.SetActive(false);
-        }
-        finally
-        {
-            connection.Close();
-            Debug.Log("Database connection closed.");
+                // 1. MNO ì¡°íšŒ
+                string selectMnoSql = "SELECT MNO FROM MEMBER WHERE TEL = :tel";
+                OracleCommand selectMnoCommand = new OracleCommand(selectMnoSql, connection);
+                selectMnoCommand.Parameters.Add("tel", OracleDbType.Varchar2).Value = tel; // SQL Injection ë°©ì§€ë¥¼ ìœ„í•´ íŒŒë¼ë¯¸í„° ì‚¬ìš©
+                object mnoResult = selectMnoCommand.ExecuteScalar();
+
+                if (mnoResult == null || mnoResult == DBNull.Value)
+                {
+                    if (alertText != null) alertText.text = "ì‚­ì œí•  íšŒì› ì •ë³´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.";
+                    if (alertUI != null) alertUI.SetActive(true);
+                    return;
+                }
+                decimal mno = Convert.ToDecimal(mnoResult);
+
+                // --- ğŸŒŸ ì¶”ê°€ëœ ì¡°ê±´ë¬¸ ì‹œì‘: ëŒ€ì—¬ ì¤‘ì¸ ë„ì„œ í™•ì¸ (IS_RETURNED = 'N') ---
+                string checkRentSql = "SELECT COUNT(*) FROM RENT WHERE MNO = :mno AND IS_RETURNED = 'N'";
+                OracleCommand checkRentCommand = new OracleCommand(checkRentSql, connection);
+                checkRentCommand.Parameters.Add("mno", OracleDbType.Decimal).Value = mno;
+
+                int rentCount = Convert.ToInt32(checkRentCommand.ExecuteScalar());
+
+                if (rentCount > 0)
+                {
+                    // ëŒ€ì—¬ ì¤‘ì¸ ë„ì„œê°€ í•˜ë‚˜ë¼ë„ ìˆì„ ê²½ìš°, failDelete íŒì—…ì„ ë„ì›€
+                    Debug.LogWarning($"MNO {mno}ëŠ” ë°˜ë‚©ë˜ì§€ ì•Šì€ ë„ì„œ {rentCount}ê¶Œì´ ìˆì–´ ì‚­ì œí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+
+                    // ğŸŒŸ í…ìŠ¤íŠ¸ ì„¤ì • ë¡œì§ (if (failDeleteText != null) ...)ì€ ì œê±°í•©ë‹ˆë‹¤.
+
+                    // ğŸŒŸ failDeleteUIë§Œ í™œì„±í™”í•©ë‹ˆë‹¤. (íŒì—… ìì²´ì— ì´ë¯¸ ì‹¤íŒ¨ ë©”ì‹œì§€ê°€ ë””ìì¸ë˜ì–´ ìˆë‹¤ê³  ê°€ì •)
+                    if (failDeleteUI != null)
+                        failDeleteUI.SetActive(true);
+
+                    return;
+                }
+                // --- ğŸŒŸ ì¶”ê°€ëœ ì¡°ê±´ë¬¸ ì¢…ë£Œ ---
+
+                // 2. Soft Delete (ëŒ€ì—¬ ì¤‘ì¸ ë„ì„œê°€ ì—†ì„ ê²½ìš°ì—ë§Œ ì‹¤í–‰)
+                string updateSql = "UPDATE MEMBER SET DELETE_AT = SYSDATE WHERE MNO = :mno";
+                OracleCommand command = new OracleCommand(updateSql, connection);
+                command.Parameters.Add("mno", OracleDbType.Decimal).Value = mno;
+
+                int rowsAffected = command.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    Debug.Log($"MNO {mno}ì˜ DELETE_AT ì—…ë°ì´íŠ¸ ì™„ë£Œ (Soft Delete)");
+                    if (deleteUI != null) deleteUI.SetActive(true); // ì‚­ì œ ì„±ê³µ íŒì—…
+
+                    if (tableController != null)
+                    {
+                        tableController.RefreshTable();
+                    }
+                }
+                else
+                {
+                    if (alertText != null) alertText.text = "íšŒì› ì •ë³´ ì—…ë°ì´íŠ¸(ì‚­ì œ) ì‹¤íŒ¨.";
+                    if (alertUI != null) alertUI.SetActive(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"DB Soft Delete ì‹¤íŒ¨: {ex.Message}");
+                if (alertText != null) alertText.text = $"DB Soft Delete ì‹¤íŒ¨: \n{ex.Message}";
+                if (alertUI != null) alertUI.SetActive(true);
+                if (deleteUI != null) deleteUI.SetActive(false);
+            }
+            finally
+            {
+                delete = false;
+                Debug.Log("Database connection closed.");
+            }
         }
     }
 
@@ -453,7 +605,5 @@ public class Page2_DB : MonoBehaviour
 
     public void SceneInit()
     {
-        Page2 active = new Page2();
-        active.Click();
     }
 }

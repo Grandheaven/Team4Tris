@@ -38,6 +38,10 @@ public class DynamicTableController : MonoBehaviour
     [Header("테이블 스타일")]
     public Color selectedRowColor = new Color(0.5f, 0.8f, 1f); // 선택 시 강조 색상
 
+    // 추가: 폰트 색상 정의 (Hex to Color)
+    private readonly Color normalTextColor = Color.black; // #000000
+    private readonly Color deletedTextColor = new Color(200f / 255f, 200f / 255f, 200f / 255f); // #C8C8C8
+
     // --- 데이터 저장 및 상태 ---
     private List<DataRow> allDataRows = new List<DataRow>(); // DB에서 가져온 원본 데이터
     private DataRow selectedRow = null; // 현재 선택된 행의 데이터
@@ -52,6 +56,7 @@ public class DynamicTableController : MonoBehaviour
         public string birth { get; set; }
         public string sex { get; set; } // "남성" 또는 "여성"이 저장됨
         public string tel { get; set; } // "010-1234-5678"이 저장됨
+        public string delete_at { get; set; } // 추가: 삭제 시각 (NULL이면 정상)
     }
 
     void Start()
@@ -77,14 +82,48 @@ public class DynamicTableController : MonoBehaviour
     }
 
     // --- 데이터 로드 (DB 연동) ---
+
+    // LoadDataAndBuildTable이 private이거나 protected일 경우,
+    // 이 public 메서드를 통해 간접적으로 호출합니다.
+    public void RefreshTable()
+    {
+        // 만약 LoadDataAndBuildTable이 private 코루틴이라면,
+        // 이 함수 내부에서 안전하게 StartCoroutine을 사용합니다.
+        // StartCoroutine(LoadDataAndBuildTable()); 
+
+        // LoadDataAndBuildTable의 로직이 단순 동기 함수로 변경되었다면,
+        // LoadDataAndBuildTable();
+
+        // 또는 새로운 이름의 동기 갱신 함수를 직접 호출합니다. (가장 간단)
+        Debug.Log("DynamicTableController: 테이블 갱신 요청 받음.");
+        StartCoroutine(LoadDataAndBuildTable()); // LoadDataAndBuildTable이 private/protected 코루틴이어도 내부에서는 호출 가능
+    }
+
+    // 이 함수가 private이면 외부 접근 불가 (보호 수준 오류의 원인)
+
     private IEnumerator LoadDataAndBuildTable()
     {
         ClearSelection();
         yield return StartCoroutine(FetchDataFromOracleDB());
+
+        // 정렬 로직 추가: delete_at이 null인 항목(정상)을 상단에 정렬
+        allDataRows.Sort((a, b) => {
+            bool aIsDeleted = string.IsNullOrEmpty(a.delete_at);
+            bool bIsDeleted = string.IsNullOrEmpty(b.delete_at);
+
+            if (aIsDeleted && !bIsDeleted) return -1; // a가 정상, b가 삭제됨 -> a가 먼저
+            if (!aIsDeleted && bIsDeleted) return 1;  // a가 삭제됨, b가 정상 -> b가 먼저
+
+            // 둘 다 정상이거나 둘 다 삭제된 경우 MNO로 정렬
+            return a.mno.CompareTo(b.mno);
+        });
+
         PopulateTable(allDataRows);
+
+        yield return null;
     }
 
-    // (유지) DB에서 데이터를 비동기로 가져오는 메소드
+    // DB에서 데이터를 비동기로 가져오는 메소드 (DELETE_AT 포함)
     private IEnumerator FetchDataFromOracleDB()
     {
         Debug.Log("Oracle DB에서 'MEMBER' 테이블 정보 로드 중...");
@@ -102,7 +141,8 @@ public class DynamicTableController : MonoBehaviour
                 using (OracleConnection connection = new OracleConnection(connString))
                 {
                     connection.Open();
-                    string sql = "SELECT MNO, NAME, BIRTH, SEX, TEL FROM MEMBER ORDER BY MNO";
+                    // 쿼리 수정: DELETE_AT 필드 추가
+                    string sql = "SELECT MNO, NAME, BIRTH, SEX, TEL, DELETE_AT FROM MEMBER ORDER BY MNO";
                     using (OracleCommand command = new OracleCommand(sql, connection))
                     {
                         using (OracleDataReader reader = command.ExecuteReader())
@@ -113,9 +153,12 @@ public class DynamicTableController : MonoBehaviour
                                 {
                                     mno = reader.GetInt32(reader.GetOrdinal("MNO")),
                                     name = ReadString(reader["NAME"]),
+                                    // BIRTH는 DateTime으로 읽어와 포맷팅
                                     birth = reader.GetDateTime(reader.GetOrdinal("BIRTH")).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                                     sex = FormatSex(ReadString(reader["SEX"])),
-                                    tel = FormatTel(ReadString(reader["TEL"]))
+                                    tel = FormatTel(ReadString(reader["TEL"])),
+                                    // DELETE_AT 처리: DBNull.Value이면 빈 문자열로 저장
+                                    delete_at = ReadString(reader["DELETE_AT"])
                                 };
                                 tempData.Add(row);
                             }
@@ -148,14 +191,14 @@ public class DynamicTableController : MonoBehaviour
         }
     }
 
-    // (유지) TableUI 에셋에 데이터를 채워넣는 메소드
+    // TableUI 에셋에 데이터를 채워넣는 메소드 (색상 변경 로직 추가)
     private void PopulateTable(List<DataRow> dataToDisplay)
     {
         ClearSelection();
 
         // 1. TableUI 에셋의 행과 열 개수 설정
         table.Rows = dataToDisplay.Count + 1;
-        table.Columns = 5;
+        // table.Columns = 5; // 그대로 유지
 
         // 2. Header 설정 (Row 0)
         table.GetCell(0, 0).text = "MNO";
@@ -170,26 +213,35 @@ public class DynamicTableController : MonoBehaviour
             DataRow rowData = dataToDisplay[i];
             int tableRowIndex = i + 1;
 
-            // 3-1. 셀에 데이터 할당
+            // 행의 삭제 상태 확인 및 텍스트 색상 결정
+            bool isDeleted = !string.IsNullOrEmpty(rowData.delete_at);
+            Color rowTextColor = isDeleted ? deletedTextColor : normalTextColor;
+
+            // 3-1. 셀에 데이터 할당 및 색상 적용
             TMP_Text mnoText = table.GetCell(tableRowIndex, 0);
             mnoText.text = rowData.mno.ToString();
             mnoText.raycastTarget = false;
+            mnoText.color = rowTextColor; // 색상 적용
 
             TMP_Text nameText = table.GetCell(tableRowIndex, 1);
             nameText.text = rowData.name;
             nameText.raycastTarget = false;
+            nameText.color = rowTextColor; // 색상 적용
 
             TMP_Text birthText = table.GetCell(tableRowIndex, 2);
             birthText.text = rowData.birth;
             birthText.raycastTarget = false;
+            birthText.color = rowTextColor; // 색상 적용
 
             TMP_Text sexText = table.GetCell(tableRowIndex, 3);
             sexText.text = rowData.sex;
             sexText.raycastTarget = false;
+            sexText.color = rowTextColor; // 색상 적용
 
             TMP_Text telText = table.GetCell(tableRowIndex, 4);
             telText.text = rowData.tel;
             telText.raycastTarget = false;
+            telText.color = rowTextColor; // 색상 적용
 
             // 3-2. 행(Row) GameObject에 클릭 이벤트(Button) 추가
             GameObject rowObject = table.GetCell(tableRowIndex, 0).transform.parent.parent.gameObject;
@@ -228,9 +280,7 @@ public class DynamicTableController : MonoBehaviour
         PopulateTable(filteredList);
     }
 
-    //
-    // --- [!!!] (핵심 수정) 검색 조건에 따라 필터링하는 메소드 ---
-    //
+    // (유지) 검색 조건에 따라 필터링하는 메소드
     private List<DataRow> FilterData(List<DataRow> data, string condition, string searchText)
     {
         if (string.IsNullOrEmpty(searchText))
@@ -256,7 +306,7 @@ public class DynamicTableController : MonoBehaviour
                 default:
                     // '선택'이거나 예상치 못한 값일 경우, 모든 필드에서 검색
                     return row.name.IndexOf(searchText, comparison) >= 0 ||
-                           row.tel.IndexOf(searchText, comparison) >= 0;
+                               row.tel.IndexOf(searchText, comparison) >= 0;
             }
         });
     }
@@ -264,6 +314,14 @@ public class DynamicTableController : MonoBehaviour
     // (유지) 행 클릭 이벤트 (선택 / 팝업1)
     private void OnRowClicked(DataRow clickedData, GameObject rowObject)
     {
+        // --- 추가된 로직: 삭제된 행(delete_at != null)은 선택 불가능 ---
+        if (!string.IsNullOrEmpty(clickedData.delete_at))
+        {
+            Debug.LogWarning($"삭제된 행({clickedData.name})은 선택할 수 없습니다.");
+            ClearSelection(); // 혹시 모를 이전 선택을 해제
+            return; // 클릭 무시
+        }
+
         Image panelImage = rowObject.transform.Find("panel").GetComponent<Image>();
         if (panelImage == null) return;
 
@@ -274,6 +332,7 @@ public class DynamicTableController : MonoBehaviour
             popup1_Details.SetActive(true);
             Page2_DB.run = true; // Page2_DB 스크립트의 run 플래그 설정
             Page2_DB.datatel = selectedRow.tel; // Page2_DB 스크립트의 datatel 설정
+            Page2_DB.isDeleted = !string.IsNullOrEmpty(selectedRow.delete_at); // 삭제 여부 플래그 전달
         }
         else
         {
@@ -305,6 +364,15 @@ public class DynamicTableController : MonoBehaviour
             Debug.LogWarning("수정할 행을 먼저 선택하세요.");
             return;
         }
+
+        // 삭제된 정보는 수정 불가 (선택적 구현)
+        if (!string.IsNullOrEmpty(selectedRow.delete_at))
+        {
+            Debug.LogWarning("이미 삭제된 정보는 수정할 수 없습니다.");
+            // 사용자에게 알림 팝업을 띄우는 것이 좋음
+            return;
+        }
+
         Debug.Log($"[수정] 버튼 클릭: {selectedRow.name} (MNO: {selectedRow.mno}) -> Popup 2를 엽니다.");
         popup2_Modify.SetActive(true);
         Page2_DB.run = true; // Page2_DB 스크립트의 run 플래그 설정
@@ -318,6 +386,15 @@ public class DynamicTableController : MonoBehaviour
             Debug.LogWarning("삭제할 행을 먼저 선택하세요.");
             return;
         }
+
+        // 이미 삭제된 정보는 다시 삭제 팝업을 띄우지 않음
+        if (!string.IsNullOrEmpty(selectedRow.delete_at))
+        {
+            Debug.Log($"[삭제] 버튼 클릭: 이미 삭제된 정보입니다. ({selectedRow.name})");
+            // 이미 삭제되었음을 알리는 팝업을 띄울 수도 있음
+            return;
+        }
+
         Debug.Log($"[삭제] 버튼 클릭: {selectedRow.name} (MNO: {selectedRow.mno}) -> Popup 3를 엽니다.");
         popup3_DeleteConfirm.SetActive(true);
 
@@ -326,6 +403,7 @@ public class DynamicTableController : MonoBehaviour
         Debug.Log(selectedRow.sex + "??");
         Debug.Log(selectedRow.tel + "??");
 
+        // Page2_DB 스크립트에게 삭제하려는 정보 전달 및 플래그 설정
         Page2_DB.run = true;
         Page2_DB.delete = true;
         Page2_DB.dataname = selectedRow.name;
@@ -334,61 +412,32 @@ public class DynamicTableController : MonoBehaviour
         Page2_DB.datatel = selectedRow.tel;
     }
 
-    // (유지) DB 삭제 로직
-    private IEnumerator DeleteMemberFromDB(DataRow rowToDelete)
-    {
-        bool isError = false;
-        string errorMessage = "";
+    // DB 삭제 로직 (DELETE 대신 UPDATE DELETE_AT으로 변경됨)
+    // 이 함수는 DynamicTableController에서 직접 호출되지 않으며, Page2_DB에서 DB 처리를 수행합니다.
+    // 여기서는 기존의 DeleteMemberFromDB를 제거하고, Page2_DB와 연동하도록 유지합니다.
 
-        Task dbTask = Task.Run(() =>
-        {
-            string connString = $"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SID={sid})));User Id={userid};Password={password};";
-            try
-            {
-                using (OracleConnection connection = new OracleConnection(connString))
-                {
-                    connection.Open();
-                    string sql = "DELETE FROM MEMBER WHERE MNO = :mno";
-                    using (OracleCommand command = new OracleCommand(sql, connection))
-                    {
-                        command.Parameters.Add("mno", OracleDbType.Int32).Value = rowToDelete.mno;
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                isError = true;
-                errorMessage = ex.Message;
-            }
-        });
-
-        yield return new WaitUntil(() => dbTask.IsCompleted);
-
-        if (isError)
-        {
-            Debug.LogError($"DB 삭제 실패: {errorMessage}");
-        }
-        else
-        {
-            Debug.Log($"MNO: {rowToDelete.mno} 삭제 완료.");
-            allDataRows.Remove(rowToDelete);
-            PopulateTable(allDataRows);
-        }
-    }
-
-    // (유지) 팝업 버튼 이벤트 처리
-    public void ConfirmDelete()
+    // (유지) 팝업 버튼 이벤트 처리 - Page2_DB에서 삭제(UPDATE DELETE_AT) 후 테이블을 갱신하도록 수정
+    public async void ConfirmDelete()
     {
         if (selectedRow != null)
         {
-            StartCoroutine(DeleteMemberFromDB(selectedRow));
+            // Page2_DB에서 DB UPDATE_DELETE_AT 실행 후 테이블을 갱신합니다.
+            // Page2_DB에서 DB 작업을 처리했다고 가정하고, 여기서 테이블만 갱신하는 로직으로 변경
+            // (Page2_DB에서 DB 처리 후 LoadDataAndBuildTable()을 호출하는 것이 더 좋음)
+
+            // 임시로 Page2_DB의 Delete 로직이 성공적으로 delete_at을 업데이트했다고 가정하고,
+            // 전체 데이터를 다시 로드하여 테이블을 갱신합니다.
+            // (실제로는 Page2_DB에서 성공적으로 UPDATE 후 이 컨트롤러의 LoadDataAndBuildTable을 호출하는 것이 가장 이상적입니다.)
+
+            // 동기적으로 DB 작업을 기다릴 수 없으므로, 잠시 후 데이터를 갱신하도록 코루틴을 다시 시작
+            StartCoroutine(LoadDataAndBuildTable());
         }
         else
         {
             Debug.LogError("삭제할 행이 선택되지 않았는데 ConfirmDelete가 호출되었습니다.");
         }
         popup3_DeleteConfirm.SetActive(false);
+        ClearSelection(); // 삭제 후 선택 해제
     }
 
     public void ClosePopUp(GameObject popupToClose)
@@ -397,6 +446,8 @@ public class DynamicTableController : MonoBehaviour
         {
             popupToClose.SetActive(false);
         }
+        // 팝업 닫을 때 선택 상태 초기화 (옵션)
+        ClearSelection();
     }
 
     // --- (유지) 유틸리티 함수 ---

@@ -290,6 +290,9 @@ public class DynamicTableController4 : MonoBehaviour
 
         Page4_DB.delete = true;
         Page4_DB.run = true;
+
+        Page4_DB.dataisbn = selectedRow.isbn.ToString();
+
         Page4_DB.datatitle = selectedRow.title;
         Page4_DB.dataauthor = selectedRow.author;
         Page4_DB.datapublisher = selectedRow.publisher;
