@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System;
 using System.Data;
 using System.Collections;
@@ -57,6 +57,9 @@ public class Page2_DB : MonoBehaviour
     public TMP_Text failText;
     public GameObject deleteUI;
 
+    [Header("delete error")]
+    public GameObject failDeleteUI;     // ğŸŒŸ ì‚­ì œ ì‹¤íŒ¨ ì‹œ ë„ìš¸ ìƒˆë¡œìš´ íŒì—…
+
     void Update()
     {
         if (tableController == null)
@@ -89,7 +92,7 @@ public class Page2_DB : MonoBehaviour
 
         if (string.IsNullOrEmpty(datatel))
         {
-            Debug.LogError("datatel °ªÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("datatel ê°’ì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -111,7 +114,7 @@ public class Page2_DB : MonoBehaviour
                         if (username != null) username.text = ReadString(reader["NAME"]);
                         if (birth != null && reader["BIRTH"] != DBNull.Value)
                         {
-                            // DB¿¡¼­ DateTimeÀ¸·Î ÀĞ¾î¿Í "yyyy-MM-dd" Çü½ÄÀ¸·Î º¯È¯
+                            // DBì—ì„œ DateTimeìœ¼ë¡œ ì½ì–´ì™€ "yyyy-MM-dd" í˜•ì‹ìœ¼ë¡œ ë³€í™˜
                             DateTime birthDate = reader.GetDateTime(reader.GetOrdinal("BIRTH"));
                             birth.text = birthDate.ToString("yyyy-MM-dd");
                         }
@@ -119,7 +122,7 @@ public class Page2_DB : MonoBehaviour
                         {
                             birth.text = string.Empty;
                         }
-                        if (sex != null) sex.text = ReadString(reader["SEX"]) == "M" ? "³²¼º" : "¿©¼º";
+                        if (sex != null) sex.text = ReadString(reader["SEX"]) == "M" ? "ë‚¨ì„±" : "ì—¬ì„±";
                         if (this.tel != null) this.tel.text = datatel;
                         if (email != null) email.text = ReadString(reader["EMAIL"]);
 
@@ -136,7 +139,7 @@ public class Page2_DB : MonoBehaviour
                                 }
                                 else
                                 {
-                                    Debug.LogError("ÀÌ¹ÌÁö µ¥ÀÌÅÍ ·Îµå ½ÇÆĞ: byte[]°¡ À¯È¿ÇÑ ÀÌ¹ÌÁö Çü½ÄÀÌ ¾Æ´Õ´Ï´Ù.");
+                                    Debug.LogError("ì´ë¯¸ì§€ ë°ì´í„° ë¡œë“œ ì‹¤íŒ¨: byte[]ê°€ ìœ íš¨í•œ ì´ë¯¸ì§€ í˜•ì‹ì´ ì•„ë‹™ë‹ˆë‹¤.");
                                     photo.texture = null;
                                 }
                             }
@@ -171,7 +174,7 @@ public class Page2_DB : MonoBehaviour
 
         if (string.IsNullOrEmpty(datatel))
         {
-            Debug.LogError("datatel °ªÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("datatel ê°’ì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -193,7 +196,7 @@ public class Page2_DB : MonoBehaviour
                         if (username2 != null) username2.text = ReadString(reader["NAME"]);
                         if (birth2 != null && reader["BIRTH"] != DBNull.Value)
                         {
-                            // DB¿¡¼­ DateTimeÀ¸·Î ÀĞ¾î¿Í "yyyy-MM-dd" Çü½ÄÀ¸·Î º¯È¯
+                            // DBì—ì„œ DateTimeìœ¼ë¡œ ì½ì–´ì™€ "yyyy-MM-dd" í˜•ì‹ìœ¼ë¡œ ë³€í™˜
                             DateTime birthDate = reader.GetDateTime(reader.GetOrdinal("BIRTH"));
                             birth2.text = birthDate.ToString("yyyy-MM-dd");
                         }
@@ -201,7 +204,7 @@ public class Page2_DB : MonoBehaviour
                         {
                             birth2.text = string.Empty;
                         }
-                        if (sex2 != null) sex2.text = ReadString(reader["SEX"]) == "M" ? "³²¼º" : "¿©¼º";
+                        if (sex2 != null) sex2.text = ReadString(reader["SEX"]) == "M" ? "ë‚¨ì„±" : "ì—¬ì„±";
                         if (this.tel2 != null) this.tel2.text = datatel;
                         if (email2 != null) email2.text = ReadString(reader["EMAIL"]);
 
@@ -218,7 +221,7 @@ public class Page2_DB : MonoBehaviour
                                 }
                                 else
                                 {
-                                    Debug.LogError("ÀÌ¹ÌÁö µ¥ÀÌÅÍ ·Îµå ½ÇÆĞ: byte[]°¡ À¯È¿ÇÑ ÀÌ¹ÌÁö Çü½ÄÀÌ ¾Æ´Õ´Ï´Ù.");
+                                    Debug.LogError("ì´ë¯¸ì§€ ë°ì´í„° ë¡œë“œ ì‹¤íŒ¨: byte[]ê°€ ìœ íš¨í•œ ì´ë¯¸ì§€ í˜•ì‹ì´ ì•„ë‹™ë‹ˆë‹¤.");
                                     photo2.texture = null;
                                 }
                             }
@@ -264,7 +267,7 @@ public class Page2_DB : MonoBehaviour
                     sex2 == null || string.IsNullOrWhiteSpace(sex2.text) ||
                     tel2 == null || string.IsNullOrWhiteSpace(tel2.text))
                 {
-                    if (alertText != null) alertText.text = "ÇÊ¼ö ÀÔ·Â Ç×¸ñÀÌ ºñ¾î ÀÖ½À´Ï´Ù.";
+                    if (alertText != null) alertText.text = "í•„ìˆ˜ ì…ë ¥ í•­ëª©ì´ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.";
                     if (alertUI != null) alertUI.SetActive(true);
                     return;
                 }
@@ -282,24 +285,24 @@ public class Page2_DB : MonoBehaviour
                 DateTime birth;
                 if (!DateTime.TryParse(this.birth2.text, out birth))
                 {
-                    if (failText != null) failText.text = "»ı³â¿ùÀÏ ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
+                    if (failText != null) failText.text = "ìƒë…„ì›”ì¼ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
                     if (failUI != null) failUI.SetActive(true);
                     return;
                 }
 
                 char sex;
                 string sexInput = this.sex2.text.Trim().ToUpper();
-                if (sexInput.StartsWith("M") || sexInput.StartsWith("³²"))
+                if (sexInput.StartsWith("M") || sexInput.StartsWith("ë‚¨"))
                 {
                     sex = 'M';
                 }
-                else if (sexInput.StartsWith("F") || sexInput.StartsWith("W") || sexInput.StartsWith("¿©"))
+                else if (sexInput.StartsWith("F") || sexInput.StartsWith("W") || sexInput.StartsWith("ì—¬"))
                 {
                     sex = 'F';
                 }
                 else
                 {
-                    if (failText != null) failText.text = "¼ºº° ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
+                    if (failText != null) failText.text = "ì„±ë³„ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
                     if (failUI != null) failUI.SetActive(true);
                     return;
                 }
@@ -311,7 +314,7 @@ public class Page2_DB : MonoBehaviour
                 {
                     if (Convert.ToInt32(telselect.ExecuteScalar()) > 0)
                     {
-                        if (failText != null) failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀüÈ­¹øÈ£ÀÔ´Ï´Ù.";
+                        if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì „í™”ë²ˆí˜¸ì…ë‹ˆë‹¤.";
                         if (failUI != null) failUI.SetActive(true);
                         return;
                     }
@@ -323,7 +326,7 @@ public class Page2_DB : MonoBehaviour
                     {
                         if (Convert.ToInt32(emailselect.ExecuteScalar()) > 0)
                         {
-                            if (failText != null) failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀÌ¸ŞÀÏÀÔ´Ï´Ù.";
+                            if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì´ë©”ì¼ì…ë‹ˆë‹¤.";
                             if (failUI != null) failUI.SetActive(true);
                             return;
                         }
@@ -343,8 +346,8 @@ public class Page2_DB : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Debug.LogError($"DB µî·Ï/¼öÁ¤ Áß ¿À·ù ¹ß»ı: {ex.Message}");
-                if (alertText != null) alertText.text = "µî·Ï/¼öÁ¤ Áß ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.\n" + ex.Message;
+                Debug.LogError($"DB ë“±ë¡/ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ ë°œìƒ: {ex.Message}");
+                if (alertText != null) alertText.text = "ë“±ë¡/ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.\n" + ex.Message;
                 if (alertUI != null) alertUI.SetActive(true);
             }
             finally
@@ -384,8 +387,8 @@ public class Page2_DB : MonoBehaviour
 
                 if (memberMno == null)
                 {
-                    Debug.LogError("¼öÁ¤ÇÒ ¸â¹öÀÇ MNO¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
-                    if (failText != null) failText.text = "¼öÁ¤ÇÒ È¸¿ø Á¤º¸¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.";
+                    Debug.LogError("ìˆ˜ì •í•  ë©¤ë²„ì˜ MNOë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                    if (failText != null) failText.text = "ìˆ˜ì •í•  íšŒì› ì •ë³´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.";
                     if (failUI != null) failUI.SetActive(true);
                     return;
                 }
@@ -395,7 +398,7 @@ public class Page2_DB : MonoBehaviour
                     sex2 == null || string.IsNullOrWhiteSpace(sex2.text) ||
                     tel2 == null || string.IsNullOrWhiteSpace(tel2.text))
                 {
-                    if (alertText != null) alertText.text = "ÇÊ¼ö ÀÔ·Â Ç×¸ñÀÌ ºñ¾î ÀÖ½À´Ï´Ù.";
+                    if (alertText != null) alertText.text = "í•„ìˆ˜ ì…ë ¥ í•­ëª©ì´ ë¹„ì–´ ìˆìŠµë‹ˆë‹¤.";
                     if (alertUI != null) alertUI.SetActive(true);
                     return;
                 }
@@ -413,24 +416,24 @@ public class Page2_DB : MonoBehaviour
                 DateTime birth;
                 if (!DateTime.TryParse(this.birth2.text, out birth))
                 {
-                    if (failText != null) failText.text = "»ı³â¿ùÀÏ ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
+                    if (failText != null) failText.text = "ìƒë…„ì›”ì¼ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
                     if (failUI != null) failUI.SetActive(true);
                     return;
                 }
 
                 char sex;
                 string sexInput = this.sex2.text.Trim().ToUpper();
-                if (sexInput.StartsWith("M") || sexInput.StartsWith("³²"))
+                if (sexInput.StartsWith("M") || sexInput.StartsWith("ë‚¨"))
                 {
                     sex = 'M';
                 }
-                else if (sexInput.StartsWith("F") || sexInput.StartsWith("W") || sexInput.StartsWith("¿©"))
+                else if (sexInput.StartsWith("F") || sexInput.StartsWith("W") || sexInput.StartsWith("ì—¬"))
                 {
                     sex = 'F';
                 }
                 else
                 {
-                    if (failText != null) failText.text = "¼ºº° ÀÔ·Â Çü½ÄÀÌ\nÀß¸øµÇ¾ú½À´Ï´Ù.";
+                    if (failText != null) failText.text = "ì„±ë³„ ì…ë ¥ í˜•ì‹ì´\nì˜ëª»ë˜ì—ˆìŠµë‹ˆë‹¤.";
                     if (failUI != null) failUI.SetActive(true);
                     return;
                 }
@@ -444,7 +447,7 @@ public class Page2_DB : MonoBehaviour
                     {
                         if (Convert.ToInt32(telselect.ExecuteScalar()) > 0)
                         {
-                            if (failText != null) failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀüÈ­¹øÈ£ÀÔ´Ï´Ù.";
+                            if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì „í™”ë²ˆí˜¸ì…ë‹ˆë‹¤.";
                             if (failUI != null) failUI.SetActive(true);
                             return;
                         }
@@ -457,7 +460,7 @@ public class Page2_DB : MonoBehaviour
                     {
                         if (Convert.ToInt32(emailselect.ExecuteScalar()) > 0)
                         {
-                            if (failText != null) failText.text = "ÀÌ¹Ì µî·ÏµÈ\nÀÌ¸ŞÀÏÀÔ´Ï´Ù.";
+                            if (failText != null) failText.text = "ì´ë¯¸ ë“±ë¡ëœ\nì´ë©”ì¼ì…ë‹ˆë‹¤.";
                             if (failUI != null) failUI.SetActive(true);
                             return;
                         }
@@ -478,8 +481,8 @@ public class Page2_DB : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Debug.LogError($"DB ¼öÁ¤ Áß ¿À·ù ¹ß»ı: {ex.Message}");
-                if (alertText != null) alertText.text = "¼öÁ¤ Áß ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.\n" + ex.Message;
+                Debug.LogError($"DB ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ ë°œìƒ: {ex.Message}");
+                if (alertText != null) alertText.text = "ìˆ˜ì • ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.\n" + ex.Message;
                 if (alertUI != null) alertUI.SetActive(true);
                 if (successUI != null) successUI.SetActive(false);
             }
@@ -496,7 +499,7 @@ public class Page2_DB : MonoBehaviour
 
     public void MemberDelete()
     {
-        Debug.Log($"»èÁ¦(Soft Delete) ½Ãµµ: {dataname} ({datatel})");
+        Debug.Log($"ì‚­ì œ(Soft Delete) ì‹œë„: {dataname} ({datatel})");
 
         if (background1 != null) background1.SetActive(false);
         if (background2 != null) background2.SetActive(false);
@@ -507,8 +510,8 @@ public class Page2_DB : MonoBehaviour
         {
             if (string.IsNullOrEmpty(datatel))
             {
-                Debug.LogError("»èÁ¦ÇÒ È¸¿ø ÀüÈ­¹øÈ£(datatel)°¡ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
-                if (alertText != null) alertText.text = "»èÁ¦ÇÒ È¸¿ø Á¤º¸°¡ ¾ø½À´Ï´Ù.";
+                Debug.LogError("ì‚­ì œí•  íšŒì› ì „í™”ë²ˆí˜¸(datatel)ê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
+                if (alertText != null) alertText.text = "ì‚­ì œí•  íšŒì› ì •ë³´ê°€ ì—†ìŠµë‹ˆë‹¤.";
                 if (alertUI != null) alertUI.SetActive(true);
                 delete = false;
                 return;
@@ -521,29 +524,53 @@ public class Page2_DB : MonoBehaviour
             {
                 connection.Open();
 
-                string selectMnoSql = $"SELECT MNO FROM MEMBER WHERE TEL = '{tel}'";
+                // 1. MNO ì¡°íšŒ
+                string selectMnoSql = "SELECT MNO FROM MEMBER WHERE TEL = :tel";
                 OracleCommand selectMnoCommand = new OracleCommand(selectMnoSql, connection);
+                selectMnoCommand.Parameters.Add("tel", OracleDbType.Varchar2).Value = tel; // SQL Injection ë°©ì§€ë¥¼ ìœ„í•´ íŒŒë¼ë¯¸í„° ì‚¬ìš©
                 object mnoResult = selectMnoCommand.ExecuteScalar();
 
                 if (mnoResult == null || mnoResult == DBNull.Value)
                 {
-                    if (alertText != null) alertText.text = "»èÁ¦ÇÒ È¸¿ø Á¤º¸¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.";
+                    if (alertText != null) alertText.text = "ì‚­ì œí•  íšŒì› ì •ë³´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.";
                     if (alertUI != null) alertUI.SetActive(true);
                     return;
                 }
                 decimal mno = Convert.ToDecimal(mnoResult);
 
+                // --- ğŸŒŸ ì¶”ê°€ëœ ì¡°ê±´ë¬¸ ì‹œì‘: ëŒ€ì—¬ ì¤‘ì¸ ë„ì„œ í™•ì¸ (IS_RETURNED = 'N') ---
+                string checkRentSql = "SELECT COUNT(*) FROM RENT WHERE MNO = :mno AND IS_RETURNED = 'N'";
+                OracleCommand checkRentCommand = new OracleCommand(checkRentSql, connection);
+                checkRentCommand.Parameters.Add("mno", OracleDbType.Decimal).Value = mno;
+
+                int rentCount = Convert.ToInt32(checkRentCommand.ExecuteScalar());
+
+                if (rentCount > 0)
+                {
+                    // ëŒ€ì—¬ ì¤‘ì¸ ë„ì„œê°€ í•˜ë‚˜ë¼ë„ ìˆì„ ê²½ìš°, failDelete íŒì—…ì„ ë„ì›€
+                    Debug.LogWarning($"MNO {mno}ëŠ” ë°˜ë‚©ë˜ì§€ ì•Šì€ ë„ì„œ {rentCount}ê¶Œì´ ìˆì–´ ì‚­ì œí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+
+                    // ğŸŒŸ í…ìŠ¤íŠ¸ ì„¤ì • ë¡œì§ (if (failDeleteText != null) ...)ì€ ì œê±°í•©ë‹ˆë‹¤.
+
+                    // ğŸŒŸ failDeleteUIë§Œ í™œì„±í™”í•©ë‹ˆë‹¤. (íŒì—… ìì²´ì— ì´ë¯¸ ì‹¤íŒ¨ ë©”ì‹œì§€ê°€ ë””ìì¸ë˜ì–´ ìˆë‹¤ê³  ê°€ì •)
+                    if (failDeleteUI != null)
+                        failDeleteUI.SetActive(true);
+
+                    return;
+                }
+                // --- ğŸŒŸ ì¶”ê°€ëœ ì¡°ê±´ë¬¸ ì¢…ë£Œ ---
+
+                // 2. Soft Delete (ëŒ€ì—¬ ì¤‘ì¸ ë„ì„œê°€ ì—†ì„ ê²½ìš°ì—ë§Œ ì‹¤í–‰)
                 string updateSql = "UPDATE MEMBER SET DELETE_AT = SYSDATE WHERE MNO = :mno";
                 OracleCommand command = new OracleCommand(updateSql, connection);
-
                 command.Parameters.Add("mno", OracleDbType.Decimal).Value = mno;
 
                 int rowsAffected = command.ExecuteNonQuery();
 
                 if (rowsAffected > 0)
                 {
-                    Debug.Log($"MNO {mno}ÀÇ DELETE_AT ¾÷µ¥ÀÌÆ® ¿Ï·á (Soft Delete)");
-                    if (deleteUI != null) deleteUI.SetActive(true);
+                    Debug.Log($"MNO {mno}ì˜ DELETE_AT ì—…ë°ì´íŠ¸ ì™„ë£Œ (Soft Delete)");
+                    if (deleteUI != null) deleteUI.SetActive(true); // ì‚­ì œ ì„±ê³µ íŒì—…
 
                     if (tableController != null)
                     {
@@ -552,14 +579,14 @@ public class Page2_DB : MonoBehaviour
                 }
                 else
                 {
-                    if (alertText != null) alertText.text = "È¸¿ø Á¤º¸ ¾÷µ¥ÀÌÆ®(»èÁ¦) ½ÇÆĞ.";
+                    if (alertText != null) alertText.text = "íšŒì› ì •ë³´ ì—…ë°ì´íŠ¸(ì‚­ì œ) ì‹¤íŒ¨.";
                     if (alertUI != null) alertUI.SetActive(true);
                 }
             }
             catch (Exception ex)
             {
-                Debug.LogError($"DB Soft Delete ½ÇÆĞ: {ex.Message}");
-                if (alertText != null) alertText.text = $"DB Soft Delete ½ÇÆĞ: \n{ex.Message}";
+                Debug.LogError($"DB Soft Delete ì‹¤íŒ¨: {ex.Message}");
+                if (alertText != null) alertText.text = $"DB Soft Delete ì‹¤íŒ¨: \n{ex.Message}";
                 if (alertUI != null) alertUI.SetActive(true);
                 if (deleteUI != null) deleteUI.SetActive(false);
             }
